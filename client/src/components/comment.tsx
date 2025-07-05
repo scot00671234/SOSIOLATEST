@@ -76,7 +76,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
             variant="ghost" 
             size="sm" 
             onClick={() => setShowReplyForm(!showReplyForm)}
-            className="text-primary hover:underline h-auto p-0"
+            className="text-muted-foreground hover:text-foreground h-auto p-0 transition-colors"
           >
             Reply
           </Button>
@@ -97,12 +97,14 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
                   variant="ghost" 
                   size="sm"
                   onClick={() => setShowReplyForm(false)}
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
                   size="sm" 
+                  className="bg-muted text-foreground hover:bg-muted/80 transition-all border border-border/50 hover:border-border/80 hover:shadow-sm"
                   disabled={!replyContent.trim() || replyMutation.isPending}
                 >
                   Reply

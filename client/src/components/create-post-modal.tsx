@@ -20,16 +20,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
 import type { Community } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
 
 const createPostSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
@@ -47,17 +55,25 @@ interface CreatePostModalProps {
 export default function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [location] = useLocation();
+  const [communityOpen, setCommunityOpen] = useState(false);
 
   const { data: communities, isLoading: communitiesLoading } = useQuery<Community[]>({
     queryKey: ["/api/communities"],
   });
+
+  // Detect current community from URL
+  const currentCommunityId = (() => {
+    const match = location.match(/^\/community\/(\d+)/);
+    return match ? match[1] : "";
+  })();
 
   const form = useForm<CreatePostData>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
       title: "",
       content: "",
-      communityId: "",
+      communityId: currentCommunityId,
     },
   });
 
@@ -106,20 +122,56 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Community</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a community" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {communities?.map((community) => (
-                        <SelectItem key={community.id} value={community.id.toString()}>
-                          {community.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover open={communityOpen} onOpenChange={setCommunityOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={communityOpen}
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? communities?.find(
+                                (community) => community.id.toString() === field.value
+                              )?.name
+                            : "Select a community"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search communities..." />
+                        <CommandEmpty>No community found.</CommandEmpty>
+                        <CommandGroup>
+                          {communities?.map((community) => (
+                            <CommandItem
+                              key={community.id}
+                              value={community.name}
+                              onSelect={() => {
+                                form.setValue("communityId", community.id.toString());
+                                setCommunityOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  field.value === community.id.toString()
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {community.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

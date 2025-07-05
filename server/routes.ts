@@ -128,12 +128,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (existingVote.voteType === voteType) {
           // User clicked same vote - remove it (toggle off)
           await storage.deleteVote(existingVote.id);
-          voteChange = -existingVote.voteType; // Remove the existing vote
+          voteChange = voteType === 1 ? -1 : 1; // Remove upvote (-1) or remove downvote (+1)
         } else {
-          // User changed their vote (upvote to downvote or vice versa)
-          await storage.updateVote(existingVote.id, voteType);
-          // Remove old vote and add new vote
-          voteChange = voteType - existingVote.voteType; // e.g., 1 - (-1) = 2 or -1 - 1 = -2
+          // User changed their vote - first remove old, then add new
+          await storage.deleteVote(existingVote.id);
+          await storage.createVote({
+            ipAddress,
+            targetType,
+            targetId,
+            voteType
+          });
+          // This is a 2-step change: remove old vote + add new vote
+          const oldVoteRemoval = existingVote.voteType === 1 ? -1 : 1;
+          const newVoteAddition = voteType === 1 ? 1 : -1;
+          voteChange = oldVoteRemoval + newVoteAddition;
         }
       } else {
         // New vote
@@ -143,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           targetId,
           voteType
         });
-        voteChange = voteType; // Add the new vote
+        voteChange = voteType === 1 ? 1 : -1; // Add upvote (+1) or add downvote (-1)
       }
 
       // Update target votes

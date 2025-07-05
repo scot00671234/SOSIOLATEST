@@ -47,10 +47,12 @@ export default function PostPage() {
 
   const { data: post, isLoading: postLoading } = useQuery<PostWithCommunity>({
     queryKey: ["/api/posts", postId],
+    queryFn: () => fetch(`/api/posts/${postId}`).then(res => res.json()),
   });
 
   const { data: comments, isLoading: commentsLoading } = useQuery<CommentWithChildren[]>({
     queryKey: ["/api/posts", postId, "comments"],
+    queryFn: () => fetch(`/api/posts/${postId}/comments`).then(res => res.json()),
   });
 
   const form = useForm<CommentData>({

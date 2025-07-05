@@ -152,9 +152,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updatePostVotes(targetId, post.votes + newVoteCount);
         }
       } else {
-        const comments = await storage.getCommentsByPost(0); // This is a limitation, we need the comment directly
-        // For now, we'll update the comment votes directly in a simpler way
-        await storage.updateCommentVotes(targetId, newVoteCount);
+        // For comments, get the current comment to update its votes
+        const comment = await storage.getComment(targetId);
+        if (comment) {
+          await storage.updateCommentVotes(targetId, comment.votes + newVoteCount);
+        }
       }
 
       res.json({ success: true });

@@ -114,7 +114,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
       </div>
       
       {/* Nested Replies */}
-      {comment.children.length > 0 && (
+      {comment.children && comment.children.length > 0 && (
         <div className="mt-4 space-y-3">
           {comment.children.map((childComment) => (
             <Comment

@@ -32,6 +32,7 @@ export interface IStorage {
   
   // Comments
   getCommentsByPost(postId: number): Promise<CommentWithChildren[]>;
+  getComment(id: number): Promise<Comment | undefined>;
   createComment(comment: InsertComment): Promise<Comment>;
   updateCommentVotes(id: number, votes: number): Promise<void>;
   
@@ -120,6 +121,11 @@ export class DatabaseStorage implements IStorage {
       .update(posts)
       .set({ commentCount: count })
       .where(eq(posts.id, id));
+  }
+
+  async getComment(id: number): Promise<Comment | undefined> {
+    const [comment] = await db.select().from(comments).where(eq(comments.id, id));
+    return comment || undefined;
   }
 
   async getCommentsByPost(postId: number): Promise<CommentWithChildren[]> {

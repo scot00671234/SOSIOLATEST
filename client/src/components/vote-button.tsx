@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,8 +20,6 @@ export default function VoteButton({
   userVote, 
   vertical = true 
 }: VoteButtonProps) {
-  const [localVotes, setLocalVotes] = useState(currentVotes);
-  const [localUserVote, setLocalUserVote] = useState(userVote);
   const queryClient = useQueryClient();
 
   const voteMutation = useMutation({
@@ -42,28 +40,16 @@ export default function VoteButton({
   });
 
   const handleVote = async (voteType: 1 | -1) => {
-    const wasVoted = localUserVote === voteType;
-    const newUserVote = wasVoted ? null : voteType;
+    console.log("Vote clicked:", { voteType, currentUserVote: userVote, currentVotes });
     
-    // Optimistic update
-    let voteDelta = 0;
-    if (localUserVote === null) {
-      voteDelta = voteType;
-    } else if (wasVoted) {
-      voteDelta = -voteType;
-    } else {
-      voteDelta = voteType * 2;
-    }
-    
-    setLocalVotes(prev => prev + voteDelta);
-    setLocalUserVote(newUserVote);
+    // Remove optimistic updates - let server handle all logic
+    console.log("Sending vote request to server...");
     
     try {
       await voteMutation.mutateAsync(voteType);
+      console.log("Vote request successful");
     } catch (error) {
-      // Revert on error
-      setLocalVotes(currentVotes);
-      setLocalUserVote(userVote);
+      console.error("Vote request failed:", error);
     }
   };
 
@@ -79,24 +65,24 @@ export default function VoteButton({
         onClick={() => handleVote(1)}
         disabled={voteMutation.isPending}
         className={cn(
-          "p-1 hover:bg-orange-50 dark:hover:bg-orange-950/30 rounded transition-colors",
-          localUserVote === 1 && "text-orange-500 bg-orange-50 dark:bg-orange-950/30"
+          "p-1 hover:bg-muted/50 rounded transition-colors",
+          userVote === 1 && "text-foreground bg-muted"
         )}
       >
         <ChevronUp className={cn(
-          "text-muted-foreground hover:text-orange-500 transition-colors",
-          localUserVote === 1 && "text-orange-500",
+          "text-muted-foreground hover:text-foreground transition-colors",
+          userVote === 1 && "text-foreground",
           vertical ? "h-4 w-4" : "h-3 w-3"
         )} />
       </Button>
       
       <span className={cn(
         "font-medium",
-        localUserVote === 1 && "text-orange-500",
-        localUserVote === -1 && "text-blue-500",
+        userVote === 1 && "text-foreground",
+        userVote === -1 && "text-foreground",
         vertical ? "text-sm" : "text-xs"
       )}>
-        {localVotes}
+        {currentVotes}
       </span>
       
       <Button
@@ -105,13 +91,13 @@ export default function VoteButton({
         onClick={() => handleVote(-1)}
         disabled={voteMutation.isPending}
         className={cn(
-          "p-1 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded transition-colors",
-          localUserVote === -1 && "text-blue-500 bg-blue-50 dark:bg-blue-950/30"
+          "p-1 hover:bg-muted/50 rounded transition-colors",
+          userVote === -1 && "text-foreground bg-muted"
         )}
       >
         <ChevronDown className={cn(
-          "text-muted-foreground hover:text-blue-500 transition-colors",
-          localUserVote === -1 && "text-blue-500",
+          "text-muted-foreground hover:text-foreground transition-colors",
+          userVote === -1 && "text-foreground",
           vertical ? "h-4 w-4" : "h-3 w-3"
         )} />
       </Button>

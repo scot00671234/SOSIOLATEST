@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Users, Plus } from "lucide-react";
+import { Search, Users, Plus, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import CreatePostModal from "./create-post-modal";
@@ -12,6 +13,7 @@ export default function Header() {
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showCreateCommunity, setShowCreateCommunity] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { theme, toggleTheme } = useTheme();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,13 +24,13 @@ export default function Header() {
 
   return (
     <>
-      <header className="border-b border-border bg-white sticky top-0 z-50">
+      <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50 transition-colors">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-4">
               <Link href="/">
-                <h1 className="text-2xl font-semibold text-primary cursor-pointer">
+                <h1 className="text-2xl font-semibold text-primary cursor-pointer tracking-tight">
                   Sosiol
                 </h1>
               </Link>
@@ -43,27 +45,41 @@ export default function Header() {
                   placeholder="Search posts, communities, comments..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 rounded-full bg-muted border-border focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="pl-10 rounded-full bg-muted/50 border-border/50 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
                 />
               </form>
             </div>
             
             {/* Action Buttons */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="ghost"
-                onClick={() => setShowCreateCommunity(true)}
-                className="text-primary hover:bg-muted"
+                size="sm"
+                onClick={toggleTheme}
+                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               >
-                <Users className="h-4 w-4 mr-2" />
-                Create Community
+                {theme === "light" ? (
+                  <Moon className="h-4 w-4" />
+                ) : (
+                  <Sun className="h-4 w-4" />
+                )}
               </Button>
               <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCreateCommunity(true)}
+                className="text-primary hover:bg-muted/50 transition-colors"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Community
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => setShowCreatePost(true)}
-                className="bg-primary text-white hover:bg-blue-600"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Create Post
+                Post
               </Button>
             </div>
           </div>

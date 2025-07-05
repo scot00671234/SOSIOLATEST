@@ -94,7 +94,7 @@ export default function PostPage() {
 
   if (postLoading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background transition-colors">
         <Header />
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="animate-pulse space-y-4">
@@ -109,7 +109,7 @@ export default function PostPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background transition-colors">
         <Header />
         <div className="max-w-4xl mx-auto px-4 py-6">
           <Card>
@@ -126,7 +126,7 @@ export default function PostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background transition-colors">
       <Header />
       
       <div className="max-w-4xl mx-auto px-4 py-6">

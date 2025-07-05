@@ -128,11 +128,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (existingVote.voteType === voteType) {
           // Remove vote (toggle off)
           await storage.deleteVote(existingVote.id);
-          newVoteCount = voteType === 1 ? -1 : 1;
+          newVoteCount = -voteType; // If removing upvote (-1), if removing downvote (+1)
         } else {
-          // Change vote
+          // Change vote (from +1 to -1 or vice versa)
           await storage.updateVote(existingVote.id, voteType);
-          newVoteCount = voteType === 1 ? 2 : -2;
+          newVoteCount = voteType === 1 ? 2 : -2; // +1 to -1 = +2, -1 to +1 = -2
         }
       } else {
         // New vote

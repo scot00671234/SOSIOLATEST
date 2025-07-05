@@ -79,12 +79,12 @@ export default function VoteButton({
         onClick={() => handleVote(1)}
         disabled={voteMutation.isPending}
         className={cn(
-          "p-1 hover:bg-orange-50 rounded transition-colors",
-          localUserVote === 1 && "text-orange-500"
+          "p-1 hover:bg-orange-50 dark:hover:bg-orange-950/30 rounded transition-colors",
+          localUserVote === 1 && "text-orange-500 bg-orange-50 dark:bg-orange-950/30"
         )}
       >
         <ChevronUp className={cn(
-          "text-muted-foreground hover:text-orange-500",
+          "text-muted-foreground hover:text-orange-500 transition-colors",
           localUserVote === 1 && "text-orange-500",
           vertical ? "h-4 w-4" : "h-3 w-3"
         )} />
@@ -105,12 +105,12 @@ export default function VoteButton({
         onClick={() => handleVote(-1)}
         disabled={voteMutation.isPending}
         className={cn(
-          "p-1 hover:bg-blue-50 rounded transition-colors",
-          localUserVote === -1 && "text-blue-500"
+          "p-1 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded transition-colors",
+          localUserVote === -1 && "text-blue-500 bg-blue-50 dark:bg-blue-950/30"
         )}
       >
         <ChevronDown className={cn(
-          "text-muted-foreground hover:text-blue-500",
+          "text-muted-foreground hover:text-blue-500 transition-colors",
           localUserVote === -1 && "text-blue-500",
           vertical ? "h-4 w-4" : "h-3 w-3"
         )} />

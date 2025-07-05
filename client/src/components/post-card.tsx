@@ -22,9 +22,9 @@ function formatTimeAgo(date: Date | string): string {
 
 export default function PostCard({ post }: PostCardProps) {
   return (
-    <Card className="hover:bg-muted/50 transition-colors">
-      <CardContent className="p-4">
-        <div className="flex items-start space-x-3">
+    <Card className="hover:bg-muted/30 transition-all duration-200 border-border/50 shadow-sm hover:shadow-md">
+      <CardContent className="p-5">
+        <div className="flex items-start space-x-4">
           {/* Vote Column */}
           <VoteButton
             targetType="post"

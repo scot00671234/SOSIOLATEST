@@ -1,0 +1,160 @@
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import Header from "@/components/header";
+import Sidebar from "@/components/sidebar";
+import PostCard from "@/components/post-card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import type { PostWithCommunity, Community, Comment } from "@shared/schema";
+
+export default function SearchPage() {
+  const [location] = useLocation();
+  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  const query = searchParams.get('q') || '';
+
+  const { data: searchResults, isLoading } = useQuery<{
+    posts: PostWithCommunity[];
+    communities: Community[];
+    comments: Comment[];
+  }>({
+    queryKey: ["/api/search", query],
+    queryFn: () => fetch(`/api/search?q=${encodeURIComponent(query)}`).then(res => res.json()),
+    enabled: !!query.trim(),
+  });
+
+  if (!query.trim()) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <Sidebar />
+            <main className="lg:col-span-3">
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <h1 className="text-2xl font-semibold mb-2">Search Sosiol</h1>
+                  <p className="text-muted-foreground">
+                    Enter a search term to find posts, communities, and comments.
+                  </p>
+                </CardContent>
+              </Card>
+            </main>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <Sidebar />
+          
+          <main className="lg:col-span-3">
+            <div className="space-y-6">
+              <Card>
+                <CardContent className="p-4">
+                  <h1 className="text-xl font-semibold mb-4">
+                    Search results for "{query}"
+                  </h1>
+                  
+                  {isLoading ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="border rounded-lg p-4">
+                          <div className="animate-pulse space-y-3">
+                            <div className="h-4 bg-muted rounded w-1/4"></div>
+                            <div className="h-6 bg-muted rounded w-3/4"></div>
+                            <div className="h-4 bg-muted rounded w-full"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* Communities */}
+                      {searchResults?.communities && searchResults.communities.length > 0 && (
+                        <div>
+                          <h3 className="font-medium text-lg mb-3">Communities</h3>
+                          <div className="space-y-2">
+                            {searchResults.communities.map((community) => (
+                              <Card key={community.id} className="hover:bg-muted/50 transition-colors">
+                                <CardContent className="p-3">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <h4 className="font-medium">{community.name}</h4>
+                                      <p className="text-sm text-muted-foreground">
+                                        Created {new Date(community.createdAt).toLocaleDateString()}
+                                      </p>
+                                    </div>
+                                    <Badge variant="secondary">Community</Badge>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Posts */}
+                      {searchResults?.posts && searchResults.posts.length > 0 && (
+                        <div>
+                          <h3 className="font-medium text-lg mb-3">Posts</h3>
+                          <div className="space-y-4">
+                            {searchResults.posts.map((post) => (
+                              <PostCard key={post.id} post={post} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Comments */}
+                      {searchResults?.comments && searchResults.comments.length > 0 && (
+                        <div>
+                          <h3 className="font-medium text-lg mb-3">Comments</h3>
+                          <div className="space-y-2">
+                            {searchResults.comments.map((comment) => (
+                              <Card key={comment.id} className="hover:bg-muted/50 transition-colors">
+                                <CardContent className="p-3">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <p className="text-sm">{comment.content}</p>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {comment.votes} votes • {new Date(comment.createdAt).toLocaleDateString()}
+                                      </p>
+                                    </div>
+                                    <Badge variant="outline">Comment</Badge>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* No results */}
+                      {searchResults && 
+                       searchResults.posts.length === 0 && 
+                       searchResults.communities.length === 0 && 
+                       searchResults.comments.length === 0 && (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">
+                            No results found for "{query}". Try different keywords.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}

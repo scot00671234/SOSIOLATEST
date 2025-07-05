@@ -11,7 +11,7 @@ export default function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background transition-colors">
       <Header />
       
       <div className="max-w-4xl mx-auto px-4 py-6">
@@ -19,9 +19,9 @@ export default function Home() {
           <Sidebar />
           
           <main className="lg:col-span-3">
-            <Card>
-              <CardContent className="p-4">
-                <h2 className="font-semibold text-xl mb-4">Popular Posts</h2>
+            <Card className="border-border/50 shadow-sm">
+              <CardContent className="p-6">
+                <h2 className="font-semibold text-xl mb-4 tracking-tight">Popular Posts</h2>
                 
                 {isLoading ? (
                   <div className="space-y-4">

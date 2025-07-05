@@ -30,7 +30,7 @@ export default function Header() {
             {/* Logo */}
             <div className="flex items-center space-x-4">
               <Link href="/">
-                <h1 className="text-2xl font-semibold text-primary cursor-pointer tracking-tight">
+                <h1 className="text-2xl font-semibold text-foreground hover:text-muted-foreground cursor-pointer tracking-tight transition-colors">
                   Sosiol
                 </h1>
               </Link>

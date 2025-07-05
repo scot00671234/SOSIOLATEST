@@ -55,12 +55,22 @@ export default function PostCard({ post }: PostCardProps) {
             
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <Link href={`/post/${post.id}`}>
-                <Button variant="ghost" size="sm" className="h-auto p-0 hover:text-primary">
+                <Button variant="ghost" size="sm" className="h-auto p-0 text-muted-foreground hover:text-foreground transition-colors">
                   <MessageCircle className="h-4 w-4 mr-1" />
                   {post.commentCount} comments
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm" className="h-auto p-0 hover:text-primary">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-auto p-0 text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => {
+                  const url = `${window.location.origin}/post/${post.id}`;
+                  navigator.clipboard.writeText(url).then(() => {
+                    // You could add a toast notification here if you want
+                  });
+                }}
+              >
                 <Share className="h-4 w-4 mr-1" />
                 Share
               </Button>

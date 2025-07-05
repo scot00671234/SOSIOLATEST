@@ -122,17 +122,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user already voted
       const existingVote = await storage.getVote(ipAddress, targetType, targetId);
       
-      let newVoteCount = 0;
+      let voteChange = 0;
       
       if (existingVote) {
         if (existingVote.voteType === voteType) {
-          // Remove vote (toggle off)
+          // User clicked same vote - remove it (toggle off)
           await storage.deleteVote(existingVote.id);
-          newVoteCount = -voteType; // If removing upvote (-1), if removing downvote (+1)
+          voteChange = -existingVote.voteType; // Remove the existing vote
         } else {
-          // Change vote (from +1 to -1 or vice versa)
+          // User changed their vote (upvote to downvote or vice versa)
           await storage.updateVote(existingVote.id, voteType);
-          newVoteCount = voteType === 1 ? 2 : -2; // +1 to -1 = +2, -1 to +1 = -2
+          // Remove old vote and add new vote
+          voteChange = voteType - existingVote.voteType; // e.g., 1 - (-1) = 2 or -1 - 1 = -2
         }
       } else {
         // New vote
@@ -142,20 +143,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           targetId,
           voteType
         });
-        newVoteCount = voteType;
+        voteChange = voteType; // Add the new vote
       }
 
       // Update target votes
       if (targetType === 'post') {
         const post = await storage.getPost(targetId);
         if (post) {
-          await storage.updatePostVotes(targetId, post.votes + newVoteCount);
+          await storage.updatePostVotes(targetId, post.votes + voteChange);
         }
       } else {
         // For comments, get the current comment to update its votes
         const comment = await storage.getComment(targetId);
         if (comment) {
-          await storage.updateCommentVotes(targetId, comment.votes + newVoteCount);
+          await storage.updateCommentVotes(targetId, comment.votes + voteChange);
         }
       }
 

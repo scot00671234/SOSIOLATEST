@@ -104,12 +104,14 @@ export default function CreateCommunityModal({ open, onOpenChange }: CreateCommu
                 type="button" 
                 variant="ghost" 
                 onClick={() => onOpenChange(false)}
+                className="text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={createCommunityMutation.isPending}
+                className="bg-muted text-foreground hover:bg-muted/80 transition-all border border-border/50 hover:border-border/80 hover:shadow-sm"
               >
                 {createCommunityMutation.isPending ? "Creating..." : "Create Community"}
               </Button>

@@ -192,6 +192,7 @@ export default function PostPage() {
                       <div className="flex justify-end">
                         <Button 
                           type="submit" 
+                          className="bg-muted text-foreground hover:bg-muted/80 transition-all border border-border/50 hover:border-border/80 hover:shadow-sm"
                           disabled={commentMutation.isPending || !form.watch("content")?.trim()}
                         >
                           {commentMutation.isPending ? "Posting..." : "Comment"}

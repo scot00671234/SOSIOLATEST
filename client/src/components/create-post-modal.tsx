@@ -163,12 +163,14 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
                 type="button" 
                 variant="ghost" 
                 onClick={() => onOpenChange(false)}
+                className="text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={createPostMutation.isPending || communitiesLoading}
+                className="bg-muted text-foreground hover:bg-muted/80 transition-all border border-border/50 hover:border-border/80 hover:shadow-sm"
               >
                 {createPostMutation.isPending ? "Creating..." : "Create Post"}
               </Button>

@@ -68,7 +68,7 @@ export default function Header() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowCreateCommunity(true)}
-                className="text-primary hover:bg-muted/50 transition-colors"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all border border-border/30 hover:border-border/60"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Community
@@ -76,7 +76,7 @@ export default function Header() {
               <Button
                 size="sm"
                 onClick={() => setShowCreatePost(true)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="bg-muted text-foreground hover:bg-muted/80 transition-all border border-border/50 hover:border-border/80 hover:shadow-sm"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Post

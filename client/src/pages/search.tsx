@@ -12,21 +12,17 @@ import type { PostWithCommunity, Community, Comment } from "@shared/schema";
 
 export default function SearchPage() {
   const [location] = useLocation();
-  const [query, setQuery] = useState('');
   
-  // Update query when location changes
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const newQuery = urlParams.get('q') || '';
-    setQuery(newQuery);
-  }, [location]);
+  // Parse query parameter directly from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const query = urlParams.get('q') || '';
 
   const { data: searchResults, isLoading, error } = useQuery<{
     posts: PostWithCommunity[];
     communities: Community[];
     comments: Comment[];
   }>({
-    queryKey: ['search', query],
+    queryKey: ['search', query, location],
     queryFn: async () => {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('Search failed');

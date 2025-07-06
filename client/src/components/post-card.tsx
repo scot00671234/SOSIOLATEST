@@ -89,7 +89,7 @@ export default function PostCard({ post }: PostCardProps) {
               </h3>
             </Link>
             
-            <p className="text-muted-foreground dark:text-gray-300 mb-3 line-clamp-3">
+            <p className="text-foreground mb-3 line-clamp-3">
               {post.content}
             </p>
             

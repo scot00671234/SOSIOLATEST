@@ -21,6 +21,9 @@ export default function Header() {
       const urlParams = new URLSearchParams(window.location.search);
       const query = urlParams.get('q') || '';
       setSearchQuery(query);
+    } else {
+      // Clear search query when not on search page
+      setSearchQuery('');
     }
   }, [location]);
 

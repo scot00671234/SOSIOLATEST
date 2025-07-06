@@ -6,6 +6,7 @@ import { z } from "zod";
 export const communities = pgTable("communities", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
+  description: text("description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -23,10 +24,12 @@ export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   content: text("content").notNull(),
   postId: integer("post_id").notNull().references(() => posts.id),
-  parentId: integer("parent_id").references(() => comments.id),
+  parentId: integer("parent_id"),
   votes: integer("votes").default(1).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+
 
 export const votes = pgTable("votes", {
   id: serial("id").primaryKey(),
@@ -103,8 +106,10 @@ export type InsertVote = z.infer<typeof insertVoteSchema>;
 // Extended types for joined data
 export type PostWithCommunity = Post & {
   community: Community;
+  userVote?: 1 | -1 | null;
 };
 
 export type CommentWithChildren = Comment & {
   children: CommentWithChildren[];
+  userVote?: 1 | -1 | null;
 };

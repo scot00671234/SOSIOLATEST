@@ -45,8 +45,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/posts", async (req, res) => {
     try {
       const communityId = req.query.communityId ? parseInt(req.query.communityId as string) : undefined;
+      const ipAddress = getClientIP(req);
       const posts = await storage.getPosts(communityId);
-      res.json(posts);
+      
+      // Add user vote information
+      const postsWithVotes = await Promise.all(
+        posts.map(async (post) => {
+          const userVote = await storage.getVote(ipAddress, 'post', post.id);
+          return {
+            ...post,
+            userVote: userVote?.voteType || null
+          };
+        })
+      );
+      
+      res.json(postsWithVotes);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch posts" });
     }
@@ -56,11 +69,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/posts/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      const ipAddress = getClientIP(req);
       const post = await storage.getPost(id);
       if (!post) {
         return res.status(404).json({ message: "Post not found" });
       }
-      res.json(post);
+      
+      // Add user vote information
+      const userVote = await storage.getVote(ipAddress, 'post', post.id);
+      const postWithVote = {
+        ...post,
+        userVote: userVote?.voteType || null
+      };
+      
+      res.json(postWithVote);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch post" });
     }
@@ -84,8 +106,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/posts/:id/comments", async (req, res) => {
     try {
       const postId = parseInt(req.params.id);
+      const ipAddress = getClientIP(req);
       const comments = await storage.getCommentsByPost(postId);
-      res.json(comments);
+      
+      // Add user vote information to comments recursively
+      const addVotesToComments = async (commentList: any[]): Promise<any[]> => {
+        return Promise.all(
+          commentList.map(async (comment) => {
+            const userVote = await storage.getVote(ipAddress, 'comment', comment.id);
+            return {
+              ...comment,
+              userVote: userVote?.voteType || null,
+              children: await addVotesToComments(comment.children || [])
+            };
+          })
+        );
+      };
+      
+      const commentsWithVotes = await addVotesToComments(comments);
+      res.json(commentsWithVotes);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch comments" });
     }

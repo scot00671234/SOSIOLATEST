@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import PostCard from "@/components/post-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { MessageCircle, Users, FileText } from "lucide-react";
 import type { PostWithCommunity, Community, Comment } from "@shared/schema";
 
 export default function SearchPage() {
@@ -79,22 +81,32 @@ export default function SearchPage() {
                       {/* Communities */}
                       {searchResults?.communities && searchResults.communities.length > 0 && (
                         <div>
-                          <h3 className="font-medium text-lg mb-3">Communities</h3>
+                          <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+                            <Users className="h-5 w-5" />
+                            Communities
+                          </h3>
                           <div className="space-y-2">
                             {searchResults.communities.map((community) => (
-                              <Card key={community.id} className="hover:bg-muted/50 transition-colors">
-                                <CardContent className="p-3">
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <h4 className="font-medium">{community.name}</h4>
-                                      <p className="text-sm text-muted-foreground">
-                                        Created {new Date(community.createdAt).toLocaleDateString()}
-                                      </p>
+                              <Link key={community.id} href={`/c/${community.name}`}>
+                                <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+                                  <CardContent className="p-3">
+                                    <div className="flex items-center justify-between">
+                                      <div>
+                                        <h4 className="font-medium">c/{community.name}</h4>
+                                        {community.description && (
+                                          <p className="text-sm text-muted-foreground mb-1">
+                                            {community.description}
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground">
+                                          Created {new Date(community.createdAt).toLocaleDateString()}
+                                        </p>
+                                      </div>
+                                      <Badge variant="secondary">Community</Badge>
                                     </div>
-                                    <Badge variant="secondary">Community</Badge>
-                                  </div>
-                                </CardContent>
-                              </Card>
+                                  </CardContent>
+                                </Card>
+                              </Link>
                             ))}
                           </div>
                         </div>
@@ -103,7 +115,10 @@ export default function SearchPage() {
                       {/* Posts */}
                       {searchResults?.posts && searchResults.posts.length > 0 && (
                         <div>
-                          <h3 className="font-medium text-lg mb-3">Posts</h3>
+                          <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+                            <FileText className="h-5 w-5" />
+                            Posts
+                          </h3>
                           <div className="space-y-4">
                             {searchResults.posts.map((post) => (
                               <PostCard key={post.id} post={post} />
@@ -115,22 +130,27 @@ export default function SearchPage() {
                       {/* Comments */}
                       {searchResults?.comments && searchResults.comments.length > 0 && (
                         <div>
-                          <h3 className="font-medium text-lg mb-3">Comments</h3>
+                          <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+                            <MessageCircle className="h-5 w-5" />
+                            Comments
+                          </h3>
                           <div className="space-y-2">
                             {searchResults.comments.map((comment) => (
-                              <Card key={comment.id} className="hover:bg-muted/50 transition-colors">
-                                <CardContent className="p-3">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                      <p className="text-sm">{comment.content}</p>
-                                      <p className="text-xs text-muted-foreground mt-1">
-                                        {comment.votes} votes • {new Date(comment.createdAt).toLocaleDateString()}
-                                      </p>
+                              <Link key={comment.id} href={`/posts/${comment.postId}`}>
+                                <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+                                  <CardContent className="p-3">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <p className="text-sm line-clamp-2">{comment.content}</p>
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          {comment.votes} votes • {new Date(comment.createdAt).toLocaleDateString()}
+                                        </p>
+                                      </div>
+                                      <Badge variant="outline">Comment</Badge>
                                     </div>
-                                    <Badge variant="outline">Comment</Badge>
-                                  </div>
-                                </CardContent>
-                              </Card>
+                                  </CardContent>
+                                </Card>
+                              </Link>
                             ))}
                           </div>
                         </div>

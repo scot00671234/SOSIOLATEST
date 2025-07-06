@@ -244,7 +244,12 @@ export class DatabaseStorage implements IStorage {
       db
         .select()
         .from(communities)
-        .where(ilike(communities.name, searchTerm)),
+        .where(
+          or(
+            ilike(communities.name, searchTerm),
+            ilike(communities.description, searchTerm)
+          )
+        ),
       
       // Search comments
       db

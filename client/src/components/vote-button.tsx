@@ -40,10 +40,12 @@ export default function VoteButton({
   });
 
   const handleVote = async (voteType: 1 | -1) => {
-    console.log("Vote clicked:", { voteType, currentUserVote: userVote, currentVotes });
+    // Prevent double-clicking
+    if (voteMutation.isPending) {
+      return;
+    }
     
-    // Remove optimistic updates - let server handle all logic
-    console.log("Sending vote request to server...");
+    console.log("Vote clicked:", { voteType, currentUserVote: userVote, currentVotes });
     
     try {
       await voteMutation.mutateAsync(voteType);

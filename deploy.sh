@@ -5,10 +5,22 @@ set -e
 
 echo "Starting deployment..."
 
-# Run database migrations
+# Wait for database to be ready
+echo "Waiting for database connection..."
+sleep 5
+
+# Run database migrations with retries
 echo "Running database migrations..."
-npx drizzle-kit push
+for i in {1..3}; do
+  if npx drizzle-kit push; then
+    echo "Database migration successful"
+    break
+  else
+    echo "Migration attempt $i failed, retrying in 5 seconds..."
+    sleep 5
+  fi
+done
 
 # Start the application
 echo "Starting application..."
-node dist/index.js
+exec node dist/index.js

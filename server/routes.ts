@@ -10,12 +10,34 @@ function getClientIP(req: any): string {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Health check endpoint
+  app.get("/health", async (req, res) => {
+    try {
+      // Test database connection
+      const result = await storage.getCommunities();
+      res.json({ 
+        status: "ok", 
+        database: "connected",
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Health check failed:", error);
+      res.status(500).json({ 
+        status: "error", 
+        database: "disconnected",
+        error: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   // Get all communities
   app.get("/api/communities", async (req, res) => {
     try {
       const communities = await storage.getCommunities();
       res.json(communities);
     } catch (error) {
+      console.error("Failed to fetch communities:", error);
       res.status(500).json({ message: "Failed to fetch communities" });
     }
   });

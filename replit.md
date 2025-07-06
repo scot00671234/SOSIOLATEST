@@ -15,8 +15,11 @@ A Reddit-style social platform built with Express.js backend and React frontend.
   - Created PostgreSQL database with environment variables
   - Installed Node.js dependencies
   - Fixed database migration by running `npm run db:push`
-  - APIs now returning 200 status codes
-  - Application ready for deployment
+  - Switched from Neon serverless to standard PostgreSQL driver for Railway compatibility
+  - Fixed database connection issues for both Replit and Railway deployments
+  - APIs now returning 200 status codes consistently
+  - Increased Railway healthcheck timeout to 300s for reliable deployments
+  - Application ready for deployment on both platforms
 
 ## Key Features
 - Communities creation and management

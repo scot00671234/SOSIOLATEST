@@ -1,10 +1,8 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "@shared/schema";
+import pg from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
-// Configure for serverless environments
-neonConfig.webSocketConstructor = ws;
+const { Pool } = pg;
+import * as schema from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -12,16 +10,18 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Handle both Railway and Neon PostgreSQL connections
+// Handle both Railway and local PostgreSQL connections
 const connectionString = process.env.DATABASE_URL;
 
-// Configure pool for Railway compatibility
+// Configure pool for Railway and local compatibility
 export const pool = new Pool({ 
   connectionString,
-  ssl: connectionString.includes('localhost') ? false : { rejectUnauthorized: false },
+  ssl: connectionString.includes('localhost') || connectionString.includes('127.0.0.1') 
+    ? false 
+    : { rejectUnauthorized: false },
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 5000,
 });
 
-export const db = drizzle({ client: pool, schema });
+export const db = drizzle(pool, { schema });

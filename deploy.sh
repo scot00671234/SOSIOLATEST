@@ -7,8 +7,8 @@ echo "Starting deployment..."
 
 # Run database migrations
 echo "Running database migrations..."
-npm run db:push
+npx drizzle-kit push
 
 # Start the application
 echo "Starting application..."
-npm run start
+node dist/index.js

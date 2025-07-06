@@ -30,7 +30,14 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      const searchUrl = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+      
+      // If we're already on search page, force reload to update query
+      if (location.startsWith('/search')) {
+        window.location.href = searchUrl;
+      } else {
+        navigate(searchUrl);
+      }
     }
   };
 

@@ -160,7 +160,7 @@ export default function PostPage() {
                       </h1>
                       
                       <div className="prose max-w-none">
-                        <p className="whitespace-pre-wrap">{post.content}</p>
+                        <p className="whitespace-pre-wrap text-foreground">{post.content}</p>
                       </div>
                     </div>
                   </div>

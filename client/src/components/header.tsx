@@ -45,7 +45,7 @@ export default function Header() {
                   placeholder="Search posts, communities, comments..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 rounded-full bg-muted/50 border-border/50 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-foreground dark:text-foreground placeholder:text-muted-foreground"
+                  className="pl-10 rounded-full bg-muted/50 border-border/50 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-black placeholder:text-muted-foreground"
                 />
               </form>
             </div>

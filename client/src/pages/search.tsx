@@ -12,10 +12,16 @@ import type { PostWithCommunity, Community, Comment } from "@shared/schema";
 
 export default function SearchPage() {
   const [location] = useLocation();
-  const searchParams = new URLSearchParams(location.split('?')[1] || '');
-  const query = searchParams.get('q') || '';
+  
+  // Parse query parameter more reliably
+  const urlParams = new URLSearchParams(window.location.search);
+  const query = urlParams.get('q') || '';
 
-  const { data: searchResults, isLoading } = useQuery<{
+  console.log('Search page - window.location.search:', window.location.search);
+  console.log('Search page - location:', location);
+  console.log('Search page - query:', query);
+
+  const { data: searchResults, isLoading, error } = useQuery<{
     posts: PostWithCommunity[];
     communities: Community[];
     comments: Comment[];
@@ -23,6 +29,10 @@ export default function SearchPage() {
     queryKey: [`/api/search?q=${encodeURIComponent(query)}`],
     enabled: !!query.trim(),
   });
+
+  console.log('Search results:', searchResults);
+  console.log('Is loading:', isLoading);
+  console.log('Error:', error);
 
   if (!query.trim()) {
     return (

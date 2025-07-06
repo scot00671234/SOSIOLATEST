@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Search, Users, Plus, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
@@ -14,6 +14,15 @@ export default function Header() {
   const [showCreateCommunity, setShowCreateCommunity] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, toggleTheme } = useTheme();
+
+  // Update search query when on search page
+  useEffect(() => {
+    if (location.startsWith('/search')) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const query = urlParams.get('q') || '';
+      setSearchQuery(query);
+    }
+  }, [location]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

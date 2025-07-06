@@ -20,8 +20,7 @@ export default function SearchPage() {
     communities: Community[];
     comments: Comment[];
   }>({
-    queryKey: ["/api/search", query],
-    queryFn: () => fetch(`/api/search?q=${encodeURIComponent(query)}`).then(res => res.json()),
+    queryKey: [`/api/search?q=${encodeURIComponent(query)}`],
     enabled: !!query.trim(),
   });
 

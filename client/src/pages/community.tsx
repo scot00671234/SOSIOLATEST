@@ -34,18 +34,20 @@ export default function CommunityPage() {
     <div className="min-h-screen bg-background transition-colors">
       <Header />
       
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <Sidebar />
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="hidden lg:block">
+            <Sidebar />
+          </div>
           
           <main className="lg:col-span-3">
             <Card>
-              <CardContent className="p-4">
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold mb-2">
+              <CardContent className="p-3 sm:p-4">
+                <div className="mb-4 sm:mb-6">
+                  <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">
                     {community?.name || "Community"}
                   </h1>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground text-sm sm:text-base">
                     Posts from this community
                   </p>
                 </div>

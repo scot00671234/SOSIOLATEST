@@ -63,41 +63,44 @@ export default function PostCard({ post }: PostCardProps) {
 
   return (
     <Card className="hover:bg-muted/30 transition-all duration-200 border-border/50 shadow-sm hover:shadow-md">
-      <CardContent className="p-5">
-        <div className="flex items-start space-x-4">
+      <CardContent className="p-3 sm:p-5">
+        <div className="flex items-start space-x-2 sm:space-x-4">
           {/* Vote Column */}
-          <VoteButton
-            targetType="post"
-            targetId={post.id}
-            currentVotes={post.votes}
-            vertical={true}
-          />
+          <div className="flex-shrink-0">
+            <VoteButton
+              targetType="post"
+              targetId={post.id}
+              currentVotes={post.votes}
+              vertical={true}
+            />
+          </div>
           
           {/* Post Content */}
-          <div className="flex-1">
-            <div className="flex items-center text-xs text-muted-foreground mb-2">
-              <Link href={`/c/${post.community.name}`} className="hover:underline">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center text-xs text-muted-foreground mb-1 sm:mb-2">
+              <Link href={`/c/${post.community.name}`} className="hover:underline truncate">
                 {post.community.name}
               </Link>
-              <span className="mx-2">•</span>
-              <span>{formatTimeAgo(post.createdAt)}</span>
+              <span className="mx-1 sm:mx-2">•</span>
+              <span className="truncate">{formatTimeAgo(post.createdAt)}</span>
             </div>
             
             <Link href={`/post/${post.id}`}>
-              <h3 className="font-semibold text-lg mb-2 cursor-pointer hover:text-primary">
+              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 cursor-pointer hover:text-primary line-clamp-2">
                 {post.title}
               </h3>
             </Link>
             
-            <p className="text-foreground mb-3 line-clamp-3">
+            <p className="text-foreground mb-2 sm:mb-3 line-clamp-2 sm:line-clamp-3 text-sm sm:text-base">
               {post.content}
             </p>
             
-            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm text-muted-foreground">
               <Link href={`/post/${post.id}`}>
                 <Button variant="ghost" size="sm" className="h-auto p-0 text-muted-foreground hover:text-foreground transition-colors">
-                  <MessageCircle className="h-4 w-4 mr-1" />
-                  {post.commentCount} comments
+                  <MessageCircle className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
+                  <span className="hidden xs:inline">{post.commentCount} comments</span>
+                  <span className="xs:hidden">{post.commentCount}</span>
                 </Button>
               </Link>
               <DropdownMenu>
@@ -107,8 +110,8 @@ export default function PostCard({ post }: PostCardProps) {
                     size="sm" 
                     className="h-auto p-0 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Share className="h-4 w-4 mr-1" />
-                    Share
+                    <Share className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
+                    <span className="hidden sm:inline">Share</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">

@@ -29,23 +29,23 @@ export default function Sidebar() {
   return (
     <aside className="lg:col-span-1">
       <Card>
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-lg mb-4">Communities</h3>
+        <CardContent className="p-3 sm:p-4">
+          <h3 className="font-semibold text-base sm:text-lg mb-3 sm:mb-4">Communities</h3>
           
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
             {communities?.map((community) => (
               <Link 
                 key={community.id} 
-                href={`/community/${community.id}`}
-                className="block py-2 px-3 text-sm hover:bg-muted rounded-lg transition-colors"
+                href={`/c/${community.name}`}
+                className="block py-2 px-2 sm:px-3 text-xs sm:text-sm hover:bg-muted rounded-lg transition-colors"
               >
-                <Users className="h-4 w-4 text-muted-foreground mr-2 inline" />
-                {community.name}
+                <Users className="h-3 sm:h-4 w-3 sm:w-4 text-muted-foreground mr-1 sm:mr-2 inline" />
+                <span className="truncate">{community.name}</span>
               </Link>
             ))}
             
             {!communities?.length && (
-              <p className="text-sm text-muted-foreground py-4">
+              <p className="text-xs sm:text-sm text-muted-foreground py-3 sm:py-4">
                 No communities yet. Create the first one!
               </p>
             )}

@@ -35,14 +35,16 @@ export default function SearchPage() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <Sidebar />
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-6">
+            <div className="hidden lg:block">
+              <Sidebar />
+            </div>
             <main className="lg:col-span-3">
               <Card>
-                <CardContent className="p-8 text-center">
-                  <h1 className="text-2xl font-semibold mb-2">Search Sosiol</h1>
-                  <p className="text-muted-foreground">
+                <CardContent className="p-6 sm:p-8 text-center">
+                  <h1 className="text-xl sm:text-2xl font-semibold mb-2">Search Sosiol</h1>
+                  <p className="text-muted-foreground text-sm sm:text-base">
                     Enter a search term to find posts, communities, and comments.
                   </p>
                 </CardContent>
@@ -58,15 +60,17 @@ export default function SearchPage() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <Sidebar />
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="hidden lg:block">
+            <Sidebar />
+          </div>
           
           <main className="lg:col-span-3">
             <div className="space-y-6">
               <Card>
-                <CardContent className="p-4">
-                  <h1 className="text-xl font-semibold mb-4">
+                <CardContent className="p-3 sm:p-4">
+                  <h1 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
                     Search results for "{query}"
                   </h1>
                   

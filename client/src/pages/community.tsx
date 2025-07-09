@@ -7,19 +7,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { PostWithCommunity, Community } from "@shared/schema";
 
 export default function CommunityPage() {
-  const { id } = useParams<{ id: string }>();
-  const communityId = parseInt(id || "0");
-
-  const { data: posts, isLoading: postsLoading } = useQuery<PostWithCommunity[]>({
-    queryKey: ["/api/posts", { communityId }],
-    queryFn: () => fetch(`/api/posts?communityId=${communityId}`).then(res => res.json()),
-  });
+  const { id, name } = useParams<{ id?: string; name?: string }>();
+  
+  // Determine if we're using ID or name-based routing
+  const isNameBased = !!name;
+  const communityId = id ? parseInt(id) : 0;
 
   const { data: communities } = useQuery<Community[]>({
     queryKey: ["/api/communities"],
   });
 
-  const community = communities?.find(c => c.id === communityId);
+  // Find community by either ID or name
+  const community = isNameBased 
+    ? communities?.find(c => c.name === name)
+    : communities?.find(c => c.id === communityId);
+
+  const actualCommunityId = community?.id || 0;
+
+  const { data: posts, isLoading: postsLoading } = useQuery<PostWithCommunity[]>({
+    queryKey: ["/api/posts", { communityId: actualCommunityId }],
+    queryFn: () => fetch(`/api/posts?communityId=${actualCommunityId}`).then(res => res.json()),
+    enabled: !!actualCommunityId,
+  });
 
   return (
     <div className="min-h-screen bg-background transition-colors">

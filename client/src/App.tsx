@@ -15,6 +15,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/community/:id" component={CommunityPage} />
+      <Route path="/c/:name" component={CommunityPage} />
       <Route path="/post/:id" component={PostPage} />
       <Route path="/search" component={SearchPage} />
       <Route component={NotFound} />

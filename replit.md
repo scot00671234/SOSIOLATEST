@@ -11,7 +11,13 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
-- **2025-01-06**: Completed migration to Replit environment
+- **2025-01-09**: Completed migration from Replit Agent to standard Replit environment
+  - Set up PostgreSQL database with proper environment variables
+  - Ran database migration with `npm run db:push` to create all tables
+  - Fixed community routing issue: added `/c/:name` route to handle name-based navigation
+  - Updated CommunityPage component to support both ID and name-based routing
+  - Application fully functional with search, community navigation, and all features working
+- **2025-01-06**: Initial Replit environment setup
   - Created PostgreSQL database with environment variables
   - Installed Node.js dependencies
   - Fixed database migration by running `npm run db:push`
@@ -19,7 +25,6 @@ A Reddit-style social platform built with Express.js backend and React frontend.
   - Fixed database connection issues for both Replit and Railway deployments
   - APIs now returning 200 status codes consistently
   - Increased Railway healthcheck timeout to 300s for reliable deployments
-  - Application ready for deployment on both platforms
 
 ## Key Features
 - Communities creation and management

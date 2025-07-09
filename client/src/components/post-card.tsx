@@ -76,7 +76,7 @@ export default function PostCard({ post }: PostCardProps) {
           {/* Post Content */}
           <div className="flex-1">
             <div className="flex items-center text-xs text-muted-foreground mb-2">
-              <Link href={`/community/${post.community.id}`} className="hover:underline">
+              <Link href={`/c/${post.community.name}`} className="hover:underline">
                 {post.community.name}
               </Link>
               <span className="mx-2">•</span>

@@ -2,13 +2,39 @@ import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import PostCard from "@/components/post-card";
+import SponsoredAdComponent from "@/components/sponsored-ad";
 import { Card, CardContent } from "@/components/ui/card";
-import type { PostWithCommunity } from "@shared/schema";
+import type { PostWithCommunity, SponsoredAd } from "@shared/schema";
 
 export default function Home() {
   const { data: posts, isLoading } = useQuery<PostWithCommunity[]>({
     queryKey: ["/api/posts"],
   });
+
+  const { data: currentAd } = useQuery<SponsoredAd | null>({
+    queryKey: ["/api/active-ad"],
+    refetchInterval: 30000, // Refetch every 30 seconds to get new ads
+  });
+
+  // Function to inject ads every 10 posts
+  const createFeedWithAds = (posts: PostWithCommunity[], ad: SponsoredAd | null) => {
+    if (!ad || !posts.length) return posts.map((post, index) => ({ type: 'post', content: post, key: `post-${index}` }));
+    
+    const feedItems: Array<{ type: 'post' | 'ad', content: PostWithCommunity | SponsoredAd, key: string }> = [];
+    
+    posts.forEach((post, index) => {
+      feedItems.push({ type: 'post', content: post, key: `post-${index}` });
+      
+      // Inject ad every 10 posts (after positions 9, 19, 29, etc.)
+      if ((index + 1) % 10 === 0) {
+        feedItems.push({ type: 'ad', content: ad, key: `ad-${index}` });
+      }
+    });
+    
+    return feedItems;
+  };
+
+  const feedItems = posts ? createFeedWithAds(posts, currentAd) : [];
 
   return (
     <div className="min-h-screen bg-background transition-colors">
@@ -39,11 +65,15 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                ) : posts?.length ? (
+                ) : feedItems.length ? (
                   <div className="space-y-3 sm:space-y-4">
-                    {posts.map((post) => (
-                      <PostCard key={post.id} post={post} />
-                    ))}
+                    {feedItems.map((item) => 
+                      item.type === 'post' ? (
+                        <PostCard key={item.key} post={item.content as PostWithCommunity} />
+                      ) : (
+                        <SponsoredAdComponent key={item.key} ad={item.content as SponsoredAd} />
+                      )
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-6 sm:py-8">

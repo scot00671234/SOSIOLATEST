@@ -11,6 +11,15 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-01-10**: Added Text-Based Ad System
+  - Created complete Stripe-integrated ad system with $2 per 1000 impressions pricing
+  - Added `/advertise` page with form for title, body, link, and impression selection
+  - Built sponsored ads database table with impression tracking and auto-deactivation
+  - Implemented ad injection every 10 posts in the main feed
+  - Added "Advertise" button to header navigation
+  - Created distinct sponsored ad component with orange styling and "Sponsored" badge
+  - Added content policy disclaimer about violent/hostile ad removal
+  - System ready for Stripe API key integration for payment processing
 - **2025-01-10**: Enhanced URL structure and navigation
   - Updated post URLs to include title slugs (e.g., `/post/15/tell-me-about-what-you-are-building`)
   - Made community names clickable throughout the application
@@ -39,6 +48,9 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - Search functionality
 - Responsive UI with dark/light theme
 - IP-based vote tracking (no user accounts needed)
+- Text-based advertising system with Stripe payments
+- Ad injection every 10 posts with impression tracking
+- Automated ad deactivation when impression limit reached
 
 ## API Endpoints
 - `GET /api/communities` - List all communities
@@ -49,12 +61,15 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - `POST /api/comments` - Create new comment
 - `POST /api/vote` - Vote on post or comment
 - `GET /api/search` - Search posts, communities, and comments
+- `POST /api/create-ad-payment` - Create Stripe payment intent for ads
+- `GET /api/active-ad` - Get active ad for feed injection (increments impressions)
 
 ## Database Schema
 - **communities**: id, name, description, created_at
 - **posts**: id, title, content, community_id, votes, comment_count, created_at
 - **comments**: id, content, post_id, parent_id, votes, created_at
 - **votes**: id, ip_address, target_type, target_id, vote_type, created_at
+- **sponsored_ads**: id, title, body, link, impressions_paid, impressions_served, active, stripe_payment_intent_id, created_at
 
 ## Project Structure
 - `/server` - Express.js backend

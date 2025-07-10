@@ -3,14 +3,17 @@ import {
   posts, 
   comments, 
   votes,
+  sponsoredAds,
   type Community, 
   type Post, 
   type Comment,
   type Vote,
+  type SponsoredAd,
   type InsertCommunity, 
   type InsertPost, 
   type InsertComment,
   type InsertVote,
+  type InsertSponsoredAd,
   type PostWithCommunity,
   type CommentWithChildren
 } from "@shared/schema";
@@ -48,6 +51,12 @@ export interface IStorage {
     communities: Community[];
     comments: Comment[];
   }>;
+  
+  // Sponsored Ads
+  getActiveAd(): Promise<SponsoredAd | undefined>;
+  createSponsoredAd(ad: InsertSponsoredAd): Promise<SponsoredAd>;
+  incrementAdImpressions(id: number): Promise<void>;
+  getAdsByPaymentIntentId(paymentIntentId: string): Promise<SponsoredAd[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -267,6 +276,58 @@ export class DatabaseStorage implements IStorage {
       communities: searchCommunities,
       comments: searchComments
     };
+  }
+
+  async getActiveAd(): Promise<SponsoredAd | undefined> {
+    const [ad] = await db
+      .select()
+      .from(sponsoredAds)
+      .where(
+        and(
+          eq(sponsoredAds.active, true),
+          sql`${sponsoredAds.impressionsServed} < ${sponsoredAds.impressionsPaid}`
+        )
+      )
+      .orderBy(sql`RANDOM()`)
+      .limit(1);
+    return ad || undefined;
+  }
+
+  async createSponsoredAd(insertAd: InsertSponsoredAd): Promise<SponsoredAd> {
+    const [ad] = await db
+      .insert(sponsoredAds)
+      .values(insertAd)
+      .returning();
+    return ad;
+  }
+
+  async incrementAdImpressions(id: number): Promise<void> {
+    await db
+      .update(sponsoredAds)
+      .set({ 
+        impressionsServed: sql`${sponsoredAds.impressionsServed} + 1` 
+      })
+      .where(eq(sponsoredAds.id, id));
+
+    // Check if we need to deactivate the ad
+    const [ad] = await db
+      .select()
+      .from(sponsoredAds)
+      .where(eq(sponsoredAds.id, id));
+
+    if (ad && ad.impressionsServed >= ad.impressionsPaid) {
+      await db
+        .update(sponsoredAds)
+        .set({ active: false })
+        .where(eq(sponsoredAds.id, id));
+    }
+  }
+
+  async getAdsByPaymentIntentId(paymentIntentId: string): Promise<SponsoredAd[]> {
+    return await db
+      .select()
+      .from(sponsoredAds)
+      .where(eq(sponsoredAds.stripePaymentIntentId, paymentIntentId));
   }
 }
 

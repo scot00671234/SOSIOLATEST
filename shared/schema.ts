@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -37,6 +37,18 @@ export const votes = pgTable("votes", {
   targetType: text("target_type").notNull(), // 'post' or 'comment'
   targetId: integer("target_id").notNull(),
   voteType: integer("vote_type").notNull(), // 1 for upvote, -1 for downvote
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const sponsoredAds = pgTable("sponsored_ads", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  body: text("body"),
+  link: varchar("link", { length: 500 }),
+  impressionsPaid: integer("impressions_paid").notNull(),
+  impressionsServed: integer("impressions_served").default(0).notNull(),
+  active: boolean("active").default(true).notNull(),
+  stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -92,16 +104,33 @@ export const insertVoteSchema = createInsertSchema(votes).omit({
   createdAt: true,
 });
 
+export const insertSponsoredAdSchema = createInsertSchema(sponsoredAds).omit({
+  id: true,
+  impressionsServed: true,
+  active: true,
+  createdAt: true,
+});
+
+export const createAdSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200, "Title too long"),
+  body: z.string().max(1000, "Body too long").optional(),
+  link: z.string().url("Invalid URL").optional().or(z.literal("")),
+  impressions: z.number().min(1000, "Minimum 1000 impressions").max(100000, "Maximum 100000 impressions"),
+});
+
 // Types
 export type Community = typeof communities.$inferSelect;
 export type Post = typeof posts.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
 export type Vote = typeof votes.$inferSelect;
+export type SponsoredAd = typeof sponsoredAds.$inferSelect;
 
 export type InsertCommunity = z.infer<typeof insertCommunitySchema>;
 export type InsertPost = z.infer<typeof insertPostSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertVote = z.infer<typeof insertVoteSchema>;
+export type InsertSponsoredAd = z.infer<typeof insertSponsoredAdSchema>;
+export type CreateAd = z.infer<typeof createAdSchema>;
 
 // Extended types for joined data
 export type PostWithCommunity = Post & {

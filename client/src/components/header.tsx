@@ -137,6 +137,16 @@ export default function Header() {
                 <Users className="h-4 w-4 mr-2" />
                 <span className="hidden lg:inline">Community</span>
               </Button>
+              <Link href="/advertise">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all border border-border/30 hover:border-border/60"
+                >
+                  <span className="hidden lg:inline">Advertise</span>
+                  <span className="lg:hidden">Ad</span>
+                </Button>
+              </Link>
               <Button
                 size="sm"
                 onClick={() => setShowCreatePost(true)}

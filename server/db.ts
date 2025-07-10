@@ -22,9 +22,6 @@ export const pool = new Pool({
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
-  // Add retry configuration for Railway deployment stability
-  retryAttempts: 3,
-  retryDelay: 1000,
 });
 
 export const db = drizzle(pool, { schema });

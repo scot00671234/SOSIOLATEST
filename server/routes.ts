@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { createAdSchema } from "@shared/schema";
 import { insertCommunitySchema, insertPostSchema, insertCommentSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -247,6 +248,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(results);
     } catch (error) {
       res.status(500).json({ message: "Search failed" });
+    }
+  });
+
+  // Create Stripe payment intent for ads
+  app.post("/api/create-ad-payment", async (req, res) => {
+    try {
+      const adData = createAdSchema.parse(req.body);
+      
+      // Calculate price: $2 per 1000 impressions
+      const priceInCents = Math.round((adData.impressions / 1000) * 2 * 100);
+      
+      // For now, create a placeholder response since we don't have Stripe keys
+      // This will be updated once Stripe keys are provided
+      res.json({
+        clientSecret: "placeholder_secret",
+        amount: priceInCents,
+        adData
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid ad data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create payment intent" });
+    }
+  });
+
+  // Get active ad for feed injection
+  app.get("/api/active-ad", async (req, res) => {
+    try {
+      const ad = await storage.getActiveAd();
+      if (ad) {
+        // Increment impression count
+        await storage.incrementAdImpressions(ad.id);
+      }
+      res.json(ad || null);
+    } catch (error) {
+      console.error("Failed to get active ad:", error);
+      res.status(500).json({ message: "Failed to get ad" });
     }
   });
 

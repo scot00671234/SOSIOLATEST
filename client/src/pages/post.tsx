@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "wouter";
+import { useParams, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,7 +40,7 @@ function formatTimeAgo(date: Date | string): string {
 }
 
 export default function PostPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string; title?: string }>();
   const postId = parseInt(id || "0");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -150,7 +150,9 @@ export default function PostPage() {
                     {/* Post Content */}
                     <div className="flex-1">
                       <div className="flex items-center text-sm text-muted-foreground mb-3">
-                        <span>{post.community.name}</span>
+                        <Link href={`/c/${post.community.name}`} className="hover:underline">
+                          {post.community.name}
+                        </Link>
                         <span className="mx-2">•</span>
                         <span>{formatTimeAgo(post.createdAt)}</span>
                       </div>

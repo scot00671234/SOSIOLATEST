@@ -11,6 +11,12 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-01-10**: Enhanced URL structure and navigation
+  - Updated post URLs to include title slugs (e.g., `/post/15/tell-me-about-what-you-are-building`)
+  - Made community names clickable throughout the application
+  - Created utility function `createPostSlug()` for consistent URL generation
+  - Community links now use name-based routing `/c/community-name`
+  - Improved user experience with SEO-friendly URLs
 - **2025-01-09**: Completed migration from Replit Agent to standard Replit environment
   - Set up PostgreSQL database with proper environment variables
   - Ran database migration with `npm run db:push` to create all tables

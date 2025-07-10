@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { createPostSlug } from "@/lib/utils";
 import VoteButton from "./vote-button";
 import type { PostWithCommunity } from "@shared/schema";
 
@@ -26,7 +27,8 @@ export default function PostCard({ post }: PostCardProps) {
   const { toast } = useToast();
 
   const handleShare = async (type: string) => {
-    const url = `${window.location.origin}/post/${post.id}`;
+    const titleSlug = createPostSlug(post.title);
+    const url = `${window.location.origin}/post/${post.id}/${titleSlug}`;
     const title = post.title;
     const text = `Check out this post: ${title}`;
 
@@ -85,7 +87,7 @@ export default function PostCard({ post }: PostCardProps) {
               <span className="truncate">{formatTimeAgo(post.createdAt)}</span>
             </div>
             
-            <Link href={`/post/${post.id}`}>
+            <Link href={`/post/${post.id}/${createPostSlug(post.title)}`}>
               <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 cursor-pointer hover:text-primary line-clamp-2">
                 {post.title}
               </h3>
@@ -96,7 +98,7 @@ export default function PostCard({ post }: PostCardProps) {
             </p>
             
             <div className="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm text-muted-foreground">
-              <Link href={`/post/${post.id}`}>
+              <Link href={`/post/${post.id}/${createPostSlug(post.title)}`}>
                 <Button variant="ghost" size="sm" className="h-auto p-0 text-muted-foreground hover:text-foreground transition-colors">
                   <MessageCircle className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
                   <span className="hidden xs:inline">{post.commentCount} comments</span>

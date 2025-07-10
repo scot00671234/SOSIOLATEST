@@ -26,14 +26,27 @@ export default function AdvertisePage() {
   const { toast } = useToast();
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
 
-  // Check for payment success
+  // Check for payment success and activate ad
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'true') {
-      toast({
-        title: "Payment Successful!",
-        description: "Your ad is now active and will appear in the feed. You'll receive an email receipt from Stripe.",
-      });
+    const paymentIntentId = urlParams.get('payment_intent');
+    
+    if (urlParams.get('success') === 'true' && paymentIntentId) {
+      // Activate the ad
+      apiRequest("POST", "/api/activate-ad", { paymentIntentId })
+        .then(() => {
+          toast({
+            title: "Payment Successful!",
+            description: "Your ad is now active and will appear in the feed. You'll receive an email receipt from Stripe.",
+          });
+        })
+        .catch(() => {
+          toast({
+            title: "Payment Received",
+            description: "Payment successful! Your ad will be activated shortly.",
+          });
+        });
+      
       // Clean up URL
       window.history.replaceState({}, '', '/advertise');
     }
@@ -102,7 +115,7 @@ export default function AdvertisePage() {
       const { error } = await stripe.confirmPayment({
         clientSecret: data.clientSecret,
         confirmParams: {
-          return_url: `${window.location.origin}/advertise?success=true`,
+          return_url: `${window.location.origin}/advertise?success=true&payment_intent=${data.paymentIntentId}`,
         },
       });
 

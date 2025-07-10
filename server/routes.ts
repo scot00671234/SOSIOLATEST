@@ -315,6 +315,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Activate ad after successful payment (fallback if webhook not set up)
+  app.post("/api/activate-ad", async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      
+      if (!stripe || !paymentIntentId) {
+        return res.status(400).json({ message: "Invalid request" });
+      }
+
+      // Verify payment was successful
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status === "succeeded") {
+        // Check if ad already exists
+        const existingAds = await storage.getAdsByPaymentIntentId(paymentIntentId);
+        
+        if (existingAds.length === 0) {
+          // Create the ad in database
+          await storage.createSponsoredAd({
+            title: paymentIntent.metadata.ad_title,
+            body: paymentIntent.metadata.ad_body || null,
+            link: paymentIntent.metadata.ad_link || null,
+            impressionsPaid: parseInt(paymentIntent.metadata.ad_impressions),
+            stripePaymentIntentId: paymentIntent.id,
+          });
+          
+          console.log("Ad activated successfully for payment:", paymentIntent.id);
+        }
+        
+        res.json({ success: true, activated: true });
+      } else {
+        res.status(400).json({ message: "Payment not completed" });
+      }
+    } catch (error) {
+      console.error("Ad activation error:", error);
+      res.status(500).json({ message: "Failed to activate ad" });
+    }
+  });
+
   // Stripe webhook to handle successful payments
   app.post("/api/stripe-webhook", async (req, res) => {
     try {

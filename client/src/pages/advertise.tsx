@@ -91,7 +91,7 @@ export default function AdvertisePage() {
       // Import Stripe dynamically
       const { loadStripe } = await import('@stripe/stripe-js');
       
-      const publicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+      const publicKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
       
       if (!publicKey) {
         toast({

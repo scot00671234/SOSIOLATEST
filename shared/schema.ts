@@ -114,7 +114,14 @@ export const insertSponsoredAdSchema = createInsertSchema(sponsoredAds).omit({
 export const createAdSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   body: z.string().max(1000, "Body too long").optional(),
-  link: z.string().url("Invalid URL").optional().or(z.literal("")),
+  link: z.string().min(1).optional().or(z.literal("")).transform((val) => {
+    if (!val || val === "") return "";
+    // Add https:// if no protocol specified
+    if (!val.startsWith("http://") && !val.startsWith("https://")) {
+      return `https://${val}`;
+    }
+    return val;
+  }),
   impressions: z.number().min(1000, "Minimum 1000 impressions").max(100000, "Maximum 100000 impressions"),
   email: z.string().email("Must be a valid email address").optional(),
 });

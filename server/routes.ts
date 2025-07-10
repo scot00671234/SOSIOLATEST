@@ -7,9 +7,10 @@ import { insertCommunitySchema, insertPostSchema, insertCommentSchema } from "@s
 import { z } from "zod";
 
 // Initialize Stripe
-const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "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";
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: "2024-12-18.acacia",
-}) : null;
+});
 
 function getClientIP(req: any): string {
   return req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';

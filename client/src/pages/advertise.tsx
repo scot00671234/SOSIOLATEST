@@ -91,7 +91,9 @@ export default function AdvertisePage() {
       // Import Stripe dynamically
       const { loadStripe } = await import('@stripe/stripe-js');
       
-      if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+      const publicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || "pk_live_51RfWPeP0VGlWmmEyMfrCtw6iAwPV1MxxHD0bvd6CeSYSDYWlvMzyQAetgawX4g3guxgMiQRBmL1oFhYqxeLxayut00A6nfRavo";
+      
+      if (!publicKey) {
         toast({
           title: "Configuration Error", 
           description: "Stripe public key not configured.",
@@ -100,7 +102,7 @@ export default function AdvertisePage() {
         return;
       }
 
-      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+      const stripe = await loadStripe(publicKey);
       
       if (!stripe) {
         toast({
@@ -219,13 +221,13 @@ export default function AdvertisePage() {
                           <FormLabel>Link (Optional)</FormLabel>
                           <FormControl>
                             <Input
-                              type="url"
-                              placeholder="https://example.com"
+                              type="text"
+                              placeholder="example.com or https://example.com"
                               {...field}
                             />
                           </FormControl>
                           <FormDescription>
-                            Where users will go when they click your ad.
+                            Where users will go when they click your ad. Protocol (https://) will be added automatically if needed.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

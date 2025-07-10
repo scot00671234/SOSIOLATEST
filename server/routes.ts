@@ -7,10 +7,16 @@ import { insertCommunitySchema, insertPostSchema, insertCommentSchema } from "@s
 import { z } from "zod";
 
 // Initialize Stripe
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "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";
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2024-12-18.acacia",
-});
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+let stripe: Stripe | null = null;
+
+if (stripeSecretKey) {
+  stripe = new Stripe(stripeSecretKey, {
+    apiVersion: "2024-12-18.acacia",
+  });
+} else {
+  console.warn("STRIPE_SECRET_KEY environment variable not set. Stripe payments will be disabled.");
+}
 
 function getClientIP(req: any): string {
   return req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';
@@ -262,7 +268,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/create-ad-payment", async (req, res) => {
     try {
       if (!stripe) {
-        return res.status(500).json({ message: "Stripe not configured" });
+        return res.status(500).json({ 
+          message: "Stripe not configured", 
+          error: "STRIPE_SECRET_KEY environment variable is required for payment processing"
+        });
       }
 
       const adData = createAdSchema.parse(req.body);
@@ -297,7 +306,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid ad data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create payment intent" });
+      // Enhanced error logging for Stripe issues
+      if (error && typeof error === 'object' && 'type' in error) {
+        console.error("Stripe error details:", {
+          type: error.type,
+          code: error.code,
+          message: error.message,
+          statusCode: error.statusCode
+        });
+      }
+      res.status(500).json({ 
+        message: "Failed to create payment intent", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
     }
   });
 

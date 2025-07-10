@@ -91,7 +91,7 @@ export default function AdvertisePage() {
       // Import Stripe dynamically
       const { loadStripe } = await import('@stripe/stripe-js');
       
-      const publicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || "pk_live_51RfWPeP0VGlWmmEyMfrCtw6iAwPV1MxxHD0bvd6CeSYSDYWlvMzyQAetgawX4g3guxgMiQRBmL1oFhYqxeLxayut00A6nfRavo";
+      const publicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
       
       if (!publicKey) {
         toast({
@@ -130,9 +130,17 @@ export default function AdvertisePage() {
       }
     },
     onError: (error: any) => {
+      let errorMessage = "Failed to create ad";
+      
+      if (error.message && error.message.includes("STRIPE_SECRET_KEY")) {
+        errorMessage = "Stripe is not configured. Please contact the site administrator.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to create ad",
+        description: errorMessage,
         variant: "destructive",
       });
     },

@@ -116,6 +116,7 @@ export const createAdSchema = z.object({
   body: z.string().max(1000, "Body too long").optional(),
   link: z.string().url("Invalid URL").optional().or(z.literal("")),
   impressions: z.number().min(1000, "Minimum 1000 impressions").max(100000, "Maximum 100000 impressions"),
+  email: z.string().email("Must be a valid email address").optional(),
 });
 
 // Types

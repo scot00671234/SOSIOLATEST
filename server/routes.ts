@@ -1,9 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import Stripe from "stripe";
 import { storage } from "./storage";
 import { createAdSchema } from "@shared/schema";
 import { insertCommunitySchema, insertPostSchema, insertCommentSchema } from "@shared/schema";
 import { z } from "zod";
+
+// Initialize Stripe
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2024-12-18.acacia",
+}) : null;
 
 function getClientIP(req: any): string {
   return req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';
@@ -254,19 +260,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create Stripe payment intent for ads
   app.post("/api/create-ad-payment", async (req, res) => {
     try {
+      if (!stripe) {
+        return res.status(500).json({ message: "Stripe not configured" });
+      }
+
       const adData = createAdSchema.parse(req.body);
       
       // Calculate price: $2 per 1000 impressions
       const priceInCents = Math.round((adData.impressions / 1000) * 2 * 100);
       
-      // For now, create a placeholder response since we don't have Stripe keys
-      // This will be updated once Stripe keys are provided
-      res.json({
-        clientSecret: "placeholder_secret",
+      // Create payment intent with Stripe
+      const paymentIntent = await stripe.paymentIntents.create({
         amount: priceInCents,
-        adData
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          ad_title: adData.title,
+          ad_impressions: adData.impressions.toString(),
+          ad_body: adData.body || "",
+          ad_link: adData.link || "",
+        },
+        receipt_email: req.body.email, // Optional: if you collect email
+        description: `Sosiol Ad: ${adData.title} (${adData.impressions.toLocaleString()} impressions)`,
+      });
+
+      res.json({
+        clientSecret: paymentIntent.client_secret,
+        amount: priceInCents,
+        paymentIntentId: paymentIntent.id,
       });
     } catch (error) {
+      console.error("Stripe payment intent error:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid ad data", errors: error.errors });
       }
@@ -286,6 +312,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to get active ad:", error);
       res.status(500).json({ message: "Failed to get ad" });
+    }
+  });
+
+  // Stripe webhook to handle successful payments
+  app.post("/api/stripe-webhook", async (req, res) => {
+    try {
+      if (!stripe) {
+        return res.status(500).json({ message: "Stripe not configured" });
+      }
+
+      const event = req.body;
+      
+      // Handle successful payment
+      if (event.type === "payment_intent.succeeded") {
+        const paymentIntent = event.data.object;
+        
+        // Create the ad in database
+        await storage.createSponsoredAd({
+          title: paymentIntent.metadata.ad_title,
+          body: paymentIntent.metadata.ad_body || null,
+          link: paymentIntent.metadata.ad_link || null,
+          impressionsPaid: parseInt(paymentIntent.metadata.ad_impressions),
+          stripePaymentIntentId: paymentIntent.id,
+        });
+        
+        console.log("Ad created successfully for payment:", paymentIntent.id);
+      }
+      
+      res.json({ received: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).json({ message: "Webhook failed" });
     }
   });
 

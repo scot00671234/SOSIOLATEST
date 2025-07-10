@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -26,6 +26,19 @@ export default function AdvertisePage() {
   const { toast } = useToast();
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
 
+  // Check for payment success
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      toast({
+        title: "Payment Successful!",
+        description: "Your ad is now active and will appear in the feed. You'll receive an email receipt from Stripe.",
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', '/advertise');
+    }
+  }, [toast]);
+
   const form = useForm<CreateAd>({
     resolver: zodResolver(createAdSchema),
     defaultValues: {
@@ -33,6 +46,7 @@ export default function AdvertisePage() {
       body: "",
       link: "",
       impressions: 1000,
+      email: "",
     },
   });
 
@@ -48,20 +62,55 @@ export default function AdvertisePage() {
 
   const createAdMutation = useMutation({
     mutationFn: async (data: CreateAd) => {
-      return apiRequest("POST", "/api/create-ad-payment", data);
+      const response = await apiRequest("POST", "/api/create-ad-payment", data);
+      return response.json();
     },
-    onSuccess: (response) => {
-      if (response.clientSecret === "placeholder_secret") {
+    onSuccess: async (data) => {
+      if (!data.clientSecret) {
         toast({
-          title: "Payment System Setup Required",
-          description: "Stripe integration is needed to process payments. Contact support for setup.",
+          title: "Payment System Error",
+          description: "Unable to create payment. Please try again.",
           variant: "destructive",
         });
-      } else {
-        // Redirect to Stripe checkout would happen here
+        return;
+      }
+
+      // Import Stripe dynamically
+      const { loadStripe } = await import('@stripe/stripe-js');
+      
+      if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
         toast({
-          title: "Payment Processing",
-          description: "Redirecting to payment...",
+          title: "Configuration Error", 
+          description: "Stripe public key not configured.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+      
+      if (!stripe) {
+        toast({
+          title: "Payment System Error",
+          description: "Unable to load payment system.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Redirect to Stripe checkout
+      const { error } = await stripe.confirmPayment({
+        clientSecret: data.clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/advertise?success=true`,
+        },
+      });
+
+      if (error) {
+        toast({
+          title: "Payment Failed",
+          description: error.message,
+          variant: "destructive",
         });
       }
     },
@@ -192,6 +241,27 @@ export default function AdvertisePage() {
                           </FormControl>
                           <FormDescription>
                             Minimum 1,000 impressions. Your ad stops showing once this limit is reached.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email (Optional)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="your@email.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Receive payment receipt and ad notifications via email.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

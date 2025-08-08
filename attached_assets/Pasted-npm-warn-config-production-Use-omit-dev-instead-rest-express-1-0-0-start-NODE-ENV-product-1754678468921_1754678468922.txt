@@ -1,0 +1,56 @@
+npm warn config production Use `--omit=dev` instead.
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+6:39:41 PM [express] serving on port 3000
+Failed to fetch communities: error: relation "communities" does not exist
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getCommunities (file:///app/dist/index.js:166:12)
+at async file:///app/dist/index.js:350:28 {
+length: 110,
+severity: 'ERROR',
+code: '42P01',
+detail: undefined,
+hint: undefined,
+position: '55',
+internalPosition: undefined,
+internalQuery: undefined,
+where: undefined,
+schema: undefined,
+table: undefined,
+column: undefined,
+dataType: undefined,
+constraint: undefined,
+file: 'parse_relation.c',
+line: '1392',
+routine: 'parserOpenTable'
+}
+6:40:38 PM [express] GET /api/communities 500 in 70ms :: {"message":"Failed to fetch communities"}
+6:40:38 PM [express] GET /api/active-ad 500 in 68ms :: {"message":"Failed to get ad"}
+Failed to get active ad: error: relation "sponsored_ads" does not exist
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getActiveAd (file:///app/dist/index.js:288:18)
+at async file:///app/dist/index.js:574:18 {
+length: 113,
+severity: 'ERROR',
+code: '42P01',
+detail: undefined,
+hint: undefined,
+position: '137',
+internalPosition: undefined,
+internalQuery: undefined,
+where: undefined,
+schema: undefined,
+table: undefined,
+column: undefined,
+dataType: undefined,
+constraint: undefined,
+file: 'parse_relation.c',
+line: '1392',
+routine: 'parserOpenTable'
+}
+6:40:38 PM [express] GET /api/posts 500 in 85ms :: {"message":"Failed to fetch posts"}
+6:40:45 PM [express] POST /api/communities 500 in 13ms :: {"message":"Failed to create community"}

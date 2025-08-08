@@ -28,5 +28,5 @@ ENV PORT=3000
 # Expose port
 EXPOSE 3000
 
-# Start the application directly with Node.js (bypass any build system detection)
-CMD ["npm", "start"]
+# Run database migration and start the application
+CMD ["sh", "-c", "node scripts/migrate-db.js && npm start"]

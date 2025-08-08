@@ -14,6 +14,7 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **2025-01-10**: Fixed VPS deployment SSL connection issue
   - Modified database configuration to disable SSL for production environments
   - Resolved "The server does not support SSL connections" error on Dokploy VPS
+  - Created database migration script that runs automatically during deployment
   - Database now works correctly on VPS, Railway, and local environments
   - All API endpoints (communities, posts, ads) now functioning properly on deployment
 - **2025-01-08**: Completed Replit Agent to Replit Environment Migration

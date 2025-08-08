@@ -1,0 +1,121 @@
+Initializing deployment
+Clonning Repo github.com/scot00671234/SOSIOLATEST.git to /etc/dokploy/applications/sosiol-app-su9iyx/code: ✅
+Cloning into '/etc/dokploy/applications/sosiol-app-su9iyx/code'...
+remote: Enumerating objects: 160, done.
+Cloned github.com/scot00671234/SOSIOLATEST.git: ✅
+Build nixpacks: ✅
+Source Type: github: ✅
+╔══════════════════════════ Nixpacks v1.39.0 ══════════════════════════╗
+║ setup      │ nodejs_18, npm-9_x                                      ║
+║──────────────────────────────────────────────────────────────────────║
+║ caddy      │ echo 'CADDY PHASE DISABLED - USING NODE.JS SERVER ONLY' ║
+║──────────────────────────────────────────────────────────────────────║
+║ install    │ npm ci                                                  ║
+║──────────────────────────────────────────────────────────────────────║
+║ build      │ npm run build                                           ║
+║──────────────────────────────────────────────────────────────────────║
+║ start      │ npm start                                               ║
+╚══════════════════════════════════════════════════════════════════════╝
+#0 building with "default" instance using docker driver
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.39kB done
+#1 DONE 0.0s
+#2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+#2 DONE 0.3s
+#3 [internal] load .dockerignore
+#3 transferring context: 177B done
+#3 DONE 0.0s
+#4 [stage-0  1/13] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+#4 DONE 0.0s
+#5 [internal] load build context
+#5 transferring context: 4.34MB 0.1s done
+#5 DONE 0.1s
+#6 [stage-0  3/13] COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
+#6 CACHED
+#7 [stage-0  4/13] RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
+#7 CACHED
+#8 [stage-0  2/13] WORKDIR /app/
+#8 CACHED
+#9 [stage-0  5/13] COPY .nixpacks/assets /assets/
+#9 CACHED
+#10 [stage-0  6/13] COPY . /app/.
+#10 DONE 0.1s
+#11 [stage-0  7/13] RUN  echo 'CADDY PHASE DISABLED - USING NODE.JS SERVER ONLY'
+#11 0.166 CADDY PHASE DISABLED - USING NODE.JS SERVER ONLY
+#11 DONE 0.2s
+#12 [stage-0  8/13] COPY . /app/.
+#12 DONE 0.1s
+#13 [stage-0  9/13] RUN --mount=type=cache,id=cY7etteaxFY-/root/npm,target=/root/.npm npm ci
+#13 0.342 npm warn config production Use `--omit=dev` instead.
+#13 6.724 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+#13 6.938 npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+#13 16.51
+#13 16.51 added 491 packages, and audited 492 packages in 16s
+#13 16.51
+#13 16.51 66 packages are looking for funding
+#13 16.51   run `npm fund` for details
+#13 16.55
+#13 16.55 11 vulnerabilities (3 low, 8 moderate)
+#13 16.55
+#13 16.55 To address issues that do not require attention, run:
+#13 16.55   npm audit fix
+#13 16.55
+#13 16.55 To address all issues (including breaking changes), run:
+#13 16.55   npm audit fix --force
+#13 16.55
+#13 16.55 Run `npm audit` for details.
+#13 DONE 16.9s
+#14 [stage-0 10/13] COPY . /app/.
+#14 DONE 0.1s
+#15 [stage-0 11/13] RUN --mount=type=cache,id=cY7etteaxFY-node_modules/cache,target=/app/node_modules/.cache npm run build
+#15 0.341 npm warn config production Use `--omit=dev` instead.
+#15 0.380
+#15 0.380 > rest-express@1.0.0 build
+#15 0.380 > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+#15 0.380
+#15 0.653 vite v5.4.19 building for production...
+#15 0.728 transforming...
+#15 1.997 Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+#15 1.997   npx update-browserslist-db@latest
+#15 1.997   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+#15 11.10 ✓ 1845 modules transformed.
+#15 11.40 rendering chunks...
+#15 11.70 computing gzip size...
+#15 11.90 ../dist/public/index.html                   0.74 kB │ gzip:   0.45 kB
+#15 11.90 ../dist/public/assets/index-C-LBe330.css   74.40 kB │ gzip:  12.54 kB
+#15 11.90 ../dist/public/assets/index-CtFyKYG2.js     2.47 kB │ gzip:   1.18 kB
+#15 11.90 ../dist/public/assets/index-SEd2oJtE.js   518.63 kB │ gzip: 156.93 kB
+#15 11.90 
+#15 11.90 (!) Some chunks are larger than 500 kB after minification. Consider:
+#15 11.90 - Using dynamic import() to code-split the application
+#15 11.90 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#15 11.90 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#15 11.90 ✓ built in 11.23s
+#15 12.11
+#15 12.11   dist/index.js  26.3kb
+#15 12.11
+#15 12.11 ⚡ Done in 8ms
+#15 DONE 12.2s
+#16 [stage-0 12/13] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+#16 DONE 0.2s
+#17 [stage-0 13/13] COPY . /app
+#17 DONE 0.1s
+#18 exporting to image
+#18 exporting layers
+#18 exporting layers 2.7s done
+#18 writing image sha256:f2accac0d4bae254a98044a3310880a33e85cf48ca384692791e1bcc8aebcc7e
+#18 writing image sha256:f2accac0d4bae254a98044a3310880a33e85cf48ca384692791e1bcc8aebcc7e done
+#18 naming to docker.io/library/sosiol-app-su9iyx done
+#18 DONE 2.7s
+7 warnings found (use docker --debug to expand):
+ - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "STRIPE_SECRET_KEY") (line 11)
+- SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "STRIPE_WEBHOOK_SECRET") (line 11)
+- SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "SESSION_SECRET") (line 12)
+- SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "STRIPE_SECRET_KEY") (line 12)
+- SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "STRIPE_WEBHOOK_SECRET") (line 12)
+- UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 22)
+- SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "SESSION_SECRET") (line 11)
+=== Successfully Built! ===
+Run:
+docker run -it sosiol-app-su9iyx
+Docker Deployed: ✅

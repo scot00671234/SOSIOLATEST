@@ -6,6 +6,8 @@ providers = ["node"]
 [variables]
 NODE_ENV = "production"
 PORT = "3000"
+# Add your production database URL here - replace with your actual database connection string
+# DATABASE_URL = "postgresql://username:password@host:port/database"
 
 # EXPLICITLY OVERRIDE ALL PHASES TO PREVENT AUTO-DETECTION
 [phases.setup]

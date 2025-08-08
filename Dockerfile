@@ -30,5 +30,5 @@ ENV PORT=3000
 # Expose port
 EXPOSE 3000
 
-# Run database migration and start the application
-CMD ["sh", "-c", "node scripts/migrate-db.js && npm start"]
+# Start the application (migration runs in nixpacks build phase)
+CMD ["npm", "start"]

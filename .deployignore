@@ -1,3 +1,0 @@
-# Force Dockerfile usage only
-nixpacks.toml
-.nixpacks/

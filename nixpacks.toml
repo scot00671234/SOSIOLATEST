@@ -1,0 +1,21 @@
+# PRODUCTION READY NIXPACKS CONFIG FOR DOKPLOY VPS
+# Simple Node.js server deployment
+
+[variables]
+NODE_ENV = "production"
+PORT = "3000"
+
+[phases.setup]
+nixPkgs = ["nodejs_18"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build] 
+cmds = [
+  "npm run build",
+  "node scripts/migrate-db.js"
+]
+
+[start]
+cmd = "npm start"

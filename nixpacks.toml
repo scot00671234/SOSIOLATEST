@@ -18,6 +18,7 @@ cmds = ["npm ci"]
 [phases.build] 
 cmds = [
   "npm run build",
+  "sed -i 's/import\\.meta\\.dirname/\"\/app\"/g' dist/index.js || true",
   "node scripts/migrate-db.js || echo 'Migration will run at startup'"
 ]
 

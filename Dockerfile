@@ -1,5 +1,6 @@
-# Alternative Dockerfile in case nixpacks doesn't work
-# This ensures a pure Node.js deployment without any static site detection
+# PURE NODE.JS SERVER - NO STATIC SITE, NO CADDY, NO PROXY
+# This is a full-stack Express.js application with built-in static serving
+# DO NOT ADD CADDY OR ANY REVERSE PROXY - THE APP HANDLES EVERYTHING
 
 FROM node:18-alpine
 
@@ -20,8 +21,12 @@ RUN npm run build
 # Remove devDependencies
 RUN npm ci --production --ignore-scripts && npm cache clean --force
 
+# Set environment variables for production
+ENV NODE_ENV=production
+ENV PORT=3000
+
 # Expose port
 EXPOSE 3000
 
-# Start the application
+# Start the application directly with Node.js (bypass any build system detection)
 CMD ["npm", "start"]

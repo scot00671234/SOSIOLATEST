@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# Exit on any error
+# NUCLEAR DEPLOYMENT SCRIPT - PURE NODE.JS SERVER
+# NO CADDY, NO STATIC SITE, NO REVERSE PROXY
 set -e
 
-echo "Starting deployment..."
+echo "🚀 DEPLOYING PURE NODE.JS SERVER - NO CADDY!"
+echo "⚡ This is a full-stack Express.js app with built-in static serving"
+echo "🔥 PORT: 3000 | NODE_ENV: production"
 
 # Wait for database to be ready
 echo "Waiting for database connection..."

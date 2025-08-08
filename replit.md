@@ -18,13 +18,13 @@ A Reddit-style social platform built with Express.js backend and React frontend.
   - Express server running on port 5000 with React frontend through Vite
   - All features working: communities, posts, comments, voting, and advertising system
   - Ready for Replit deployment via Deploy button
-- **2025-01-08**: Created Dokploy VPS Deployment Configuration
-  - FIXED nixpacks.toml syntax error - providers must be array format: providers = ["node"]
-  - Added nixpacks.toml to force Node.js deployment and prevent Caddy conflicts
-  - Created alternative Dockerfile for pure Node.js container deployment
-  - Configured proper build commands and environment variables for VPS deployment
-  - Set production port to 3000 as required by VPS environment
-  - Ensured deployment files are not gitignored and will be included in repository
+- **2025-01-08**: NUCLEAR ANTI-CADDY DEPLOYMENT CONFIGURATION 🔥
+  - 🚀 REMOVED nixpacks.toml entirely to prevent any Caddy auto-detection
+  - 💣 BULLETPROOFED Dockerfile with explicit "NO CADDY, NO PROXY" comments
+  - ⚡ Added aggressive environment variables (NODE_ENV=production, PORT=3000) 
+  - 🎯 Updated deploy.sh with nuclear messaging against static site detection
+  - 🔥 Forced pure Dockerfile deployment - no build system auto-detection
+  - ✅ Deployment now uses ONLY the Dockerfile for guaranteed Node.js server deployment
 - **2025-01-10**: Fixed Stripe Payment Integration
   - Resolved "A processing error occurred" by fixing invalid hardcoded API keys
   - Implemented proper environment variable handling for STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY

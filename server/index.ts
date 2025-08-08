@@ -56,8 +56,7 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Serve the app on Railway's PORT or fallback to 5000
-  // Railway provides PORT environment variable
+  // Serve on PORT environment variable (production) or fallback to 5000 (development)
   const port = process.env.PORT || 5000;
   server.listen({
     port,

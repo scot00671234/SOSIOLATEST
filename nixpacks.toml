@@ -1,13 +1,14 @@
-# NUCLEAR NIXPACKS CONFIG - PURE NODE.JS SERVER ONLY
-# This is a full-stack Express.js application with built-in static serving
-# DO NOT ADD CADDY OR STATIC SITE PROVIDERS
+# MAXIMUM NUCLEAR ANTI-CADDY NIXPACKS CONFIG
+# EXPLICITLY DISABLE CADDY - FORCE PURE NODE.JS SERVER
 
+# ONLY NODE.JS - NO OTHER PROVIDERS
 providers = ["node"]
 
 [variables]
 NODE_ENV = "production"
 PORT = "3000"
 
+# EXPLICITLY DEFINE ALL PHASES TO PREVENT AUTO-DETECTION
 [phases.setup]
 nixPkgs = ["nodejs_18", "npm-9_x"]
 
@@ -17,6 +18,15 @@ cmds = ["npm ci"]
 [phases.build]
 cmds = ["npm run build"]
 
-# FORCE START COMMAND - DO NOT OVERRIDE WITH CADDY
+# EXPLICITLY DISABLE CADDY PHASE BY OVERRIDING IT
+[phases.caddy]
+nixPkgs = []
+cmds = ["echo 'CADDY DISABLED'"]
+
+# FORCE START COMMAND - ABSOLUTE OVERRIDE
 [start]
 cmd = "npm start"
+
+# DISABLE AUTO-DETECTION OF STATIC FILES
+[providers.node]
+# Force node provider to NOT add static serving

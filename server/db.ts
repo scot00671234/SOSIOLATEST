@@ -13,10 +13,12 @@ if (!process.env.DATABASE_URL) {
 // Handle both Railway and local PostgreSQL connections
 const connectionString = process.env.DATABASE_URL;
 
-// Configure pool for Railway and local compatibility
+// Configure pool for VPS, Railway, and local compatibility
 export const pool = new Pool({ 
   connectionString,
-  ssl: connectionString.includes('localhost') || connectionString.includes('127.0.0.1') 
+  ssl: connectionString.includes('localhost') || 
+       connectionString.includes('127.0.0.1') ||
+       process.env.NODE_ENV === 'production'
     ? false 
     : { rejectUnauthorized: false },
   max: 20,

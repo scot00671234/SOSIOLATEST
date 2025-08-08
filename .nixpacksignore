@@ -1,0 +1,7 @@
+client/index.html
+dist/public/index.html
+*.html
+public/
+static/
+assets/
+Caddyfile

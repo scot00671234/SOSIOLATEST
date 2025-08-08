@@ -1,0 +1,3 @@
+# This file prevents Nixpacks from detecting static content
+# The build process handles static files through Node.js server
+false

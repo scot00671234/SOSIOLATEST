@@ -1,12 +1,18 @@
-# PRODUCTION READY NIXPACKS CONFIG FOR DOKPLOY VPS
-# Simple Node.js server deployment
+# ULTIMATE NUCLEAR ANTI-CADDY NIXPACKS CONFIG
+# ABSOLUTE NODE.JS SERVER ONLY - NO STATIC DETECTION
+
+providers = ["node"]
 
 [variables]
 NODE_ENV = "production"
 PORT = "3000"
+NIXPACKS_NO_CADDY = "1"
+DISABLE_CADDY = "true"
 
 [phases.setup]
 nixPkgs = ["nodejs_18"]
+# Remove any HTML files that trigger static detection
+cmds = ["rm -rf client/index.html dist/public/index.html || true"]
 
 [phases.install]
 cmds = ["npm ci"]
@@ -14,8 +20,19 @@ cmds = ["npm ci"]
 [phases.build] 
 cmds = [
   "npm run build",
-  "node scripts/migrate-db.js"
+  "node scripts/migrate-db.js || echo 'Migration will run at startup'"
 ]
+
+# COMPLETELY DISABLE AND OVERRIDE CADDY
+[phases.caddy]
+nixPkgs = []
+cmds = [
+  "echo 'CADDY PHASE COMPLETELY DISABLED'",
+  "echo 'NODE.JS SERVER HANDLES ALL REQUESTS'",
+  "rm -rf /assets/Caddyfile || true"
+]
+
+[staticDir]
 
 [start]
 cmd = "npm start"

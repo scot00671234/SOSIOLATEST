@@ -6,6 +6,8 @@ providers = ["node"]
 [variables]
 NODE_ENV = "production"
 PORT = "3000"
+PWD = "/app"
+INIT_CWD = "/app"
 
 # EXPLICITLY OVERRIDE ALL PHASES TO PREVENT AUTO-DETECTION
 [phases.setup]
@@ -24,7 +26,7 @@ cmds = ["echo 'CADDY PHASE DISABLED - USING NODE.JS SERVER ONLY'"]
 
 # ABSOLUTE OVERRIDE OF START COMMAND
 [start]
-cmd = "npm start"
+cmd = "cd /app && npm start"
 
 # DISABLE STATIC FILE DETECTION COMPLETELY
 [build]

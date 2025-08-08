@@ -19,9 +19,11 @@ A Reddit-style social platform built with Express.js backend and React frontend.
   - All features working: communities, posts, comments, voting, and advertising system
   - Ready for Replit deployment via Deploy button
 - **2025-01-08**: Created Dokploy VPS Deployment Configuration
+  - FIXED nixpacks.toml syntax error - providers must be array format: providers = ["node"]
   - Added nixpacks.toml to force Node.js deployment and prevent Caddy conflicts
   - Created alternative Dockerfile for pure Node.js container deployment
   - Configured proper build commands and environment variables for VPS deployment
+  - Set production port to 3000 as required by VPS environment
   - Ensured deployment files are not gitignored and will be included in repository
 - **2025-01-10**: Fixed Stripe Payment Integration
   - Resolved "A processing error occurred" by fixing invalid hardcoded API keys

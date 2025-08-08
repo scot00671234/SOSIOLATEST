@@ -20,11 +20,3 @@ cmds = ["npm run build"]
 # FORCE START COMMAND - DO NOT OVERRIDE WITH CADDY
 [start]
 cmd = "npm start"
-
-# PREVENT STATIC SITE DETECTION
-[staticAssets]
-publicDir = false
-
-# EXPLICITLY DISABLE OTHER PROVIDERS
-[providers.static]
-enabled = false

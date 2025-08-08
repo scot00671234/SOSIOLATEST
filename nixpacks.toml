@@ -1,0 +1,34 @@
+# Nixpacks configuration to force Node.js deployment without Caddy
+# This prevents Dokploy from treating the app as a static site
+
+[providers]
+# Force Node.js detection and disable static site detection
+nodejs = "18"
+
+[variables]
+# Environment variables for production deployment
+NODE_ENV = "production"
+PORT = "5000"
+NIXPACKS_NO_STATIC_SITE = "true"
+
+[phases.setup]
+# Install Node.js and npm only - explicitly exclude Caddy and static site packages
+nixPkgs = ["nodejs_18", "npm-9_x"]
+# Prevent caddy installation by overriding detection
+onlyIncludeFiles = ["package.json", "package-lock.json", "server", "shared", "client", "drizzle.config.ts", "vite.config.ts", "tsconfig.json", "tailwind.config.ts", "postcss.config.js"]
+
+[phases.install]
+# Install dependencies including devDependencies for build
+cmds = ["npm ci --production=false"]
+
+[phases.build]
+# Build both frontend and backend
+cmds = ["npm run build"]
+
+# Explicitly disable static providers that might trigger Caddy
+[providers.node]
+version = "18"
+
+[start]
+# Start the Node.js Express server directly, bypassing any proxy
+cmd = "npm start"

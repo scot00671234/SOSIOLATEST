@@ -1,17 +1,15 @@
-# Use Node.js 20 LTS
-FROM node:20-alpine
+# Alternative Dockerfile in case nixpacks doesn't work
+# This ensures a pure Node.js deployment without any static site detection
 
-# Install bash for our deploy script
-RUN apk add --no-cache bash
+FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files first for better layer caching
+# Copy package files
 COPY package*.json ./
 
-# Install all dependencies
-RUN npm ci
+# Install dependencies
+RUN npm ci --production=false
 
 # Copy source code
 COPY . .
@@ -19,14 +17,11 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Make deploy script executable
-RUN chmod +x deploy.sh
+# Remove devDependencies
+RUN npm ci --production --ignore-scripts && npm cache clean --force
 
 # Expose port
 EXPOSE 5000
 
-# Set NODE_ENV to production
-ENV NODE_ENV=production
-
-# Start with our deploy script
-CMD ["bash", "deploy.sh"]
+# Start the application
+CMD ["npm", "start"]

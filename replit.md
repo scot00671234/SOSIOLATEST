@@ -11,6 +11,11 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-01-10**: Created Dokploy VPS Deployment Configuration
+  - Added nixpacks.toml to force Node.js deployment and prevent Caddy conflicts
+  - Created alternative Dockerfile for pure Node.js container deployment
+  - Configured proper build commands and environment variables for VPS deployment
+  - Ensured deployment files are not gitignored and will be included in repository
 - **2025-01-10**: Fixed Stripe Payment Integration
   - Resolved "A processing error occurred" by fixing invalid hardcoded API keys
   - Implemented proper environment variable handling for STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY

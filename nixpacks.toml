@@ -18,7 +18,7 @@ cmds = ["npm ci"]
 [phases.build] 
 cmds = [
   "npm run build",
-  "sed -i 's|import\\.meta\\.dirname|\"/app\"|g' dist/index.js || true"
+  "sed -i 's|import\\.meta\\.dirname|\"/app/dist\"|g' dist/index.js || true"
 ]
 
 # COMPLETELY DISABLE AND OVERRIDE CADDY

@@ -6,7 +6,6 @@ providers = ["node"]
 [variables]
 NODE_ENV = "production"
 PORT = "3000"
-DATABASE_URL = "postgresql://postgres:sgzrfcubbcodcmos@sosiol-database-khohaw:5432/postgres"
 
 # EXPLICITLY OVERRIDE ALL PHASES TO PREVENT AUTO-DETECTION
 [phases.setup]

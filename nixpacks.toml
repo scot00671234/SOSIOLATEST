@@ -17,7 +17,10 @@ nixPkgs = ["nodejs_18", "npm-9_x"]
 cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = [
+  "npm run build",
+  "sed -i 's/import\\.meta\\.dirname/\"\\/app\\/dist\"/g' dist/index.js"
+]
 
 # NUCLEAR OPTION: EXPLICITLY DISABLE CADDY PHASE
 [phases.caddy]

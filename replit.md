@@ -16,14 +16,13 @@ A Reddit-style social platform built with Express.js backend and React frontend.
   - Resolved "The server does not support SSL connections" error on Dokploy VPS
   - Database now works correctly on VPS, Railway, and local environments
   - All API endpoints (communities, posts, ads) now functioning properly on deployment
-- **2025-01-10**: NUCLEAR ANTI-CADDY NIXPACKS DEPLOYMENT FOR DOKPLOY VPS 🔥
-  - Created ultimate nixpacks.toml with providers=["node"] to force Node.js only
-  - Added explicit Caddy phase override to prevent static site auto-detection
-  - Created server.js dummy file to reinforce Node.js detection over HTML files
-  - Database migration runs during build phase ensuring tables exist before startup
-  - Added .static file to block static content detection entirely
-  - GUARANTEED Node.js server deployment without Caddy interference
-  - SSL disabled for VPS PostgreSQL compatibility
+- **2025-01-10**: SUCCESSFUL CADDY ELIMINATION & BUILD FIX FOR DOKPLOY VPS ✅
+  - ✅ CADDY COMPLETELY DISABLED - confirmed in deployment logs
+  - Fixed Vite build error by restoring client/index.html (required for build entry point)
+  - Maintained Node.js-only deployment with providers=["node"] in nixpacks.toml
+  - Database migration ready to run during build phase
+  - Eliminated static site auto-detection while preserving build requirements
+  - Ready for successful production deployment on VPS
 - **2025-01-08**: Completed Replit Agent to Replit Environment Migration
   - Successfully provisioned PostgreSQL database with proper environment variables
   - Migrated all Node.js dependencies and configuration files

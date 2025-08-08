@@ -11,8 +11,6 @@ DISABLE_CADDY = "true"
 
 [phases.setup]
 nixPkgs = ["nodejs_18"]
-# Remove any HTML files that trigger static detection
-cmds = ["rm -rf client/index.html dist/public/index.html || true"]
 
 [phases.install]
 cmds = ["npm ci"]
@@ -29,7 +27,8 @@ nixPkgs = []
 cmds = [
   "echo 'CADDY PHASE COMPLETELY DISABLED'",
   "echo 'NODE.JS SERVER HANDLES ALL REQUESTS'",
-  "rm -rf /assets/Caddyfile || true"
+  "rm -rf /assets/Caddyfile || true",
+  "mkdir -p /app/dist/public || true"
 ]
 
 [staticDir]

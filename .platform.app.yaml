@@ -1,0 +1,4 @@
+# Platform.sh config to force Dockerfile
+type: 'docker'
+build:
+  flavor: none

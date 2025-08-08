@@ -1,0 +1,3 @@
+# Force Dokploy to use Dockerfile exclusively
+DOCKERFILE_ONLY=true
+DISABLE_NIXPACKS=true

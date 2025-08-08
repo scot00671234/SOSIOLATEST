@@ -1,8 +1,10 @@
+# FORCE DOCKERFILE USAGE - DISABLE ALL AUTO-DETECTION
 # PURE NODE.JS SERVER - NO STATIC SITE, NO CADDY, NO PROXY
 # This is a full-stack Express.js application with built-in static serving
 # DO NOT ADD CADDY OR ANY REVERSE PROXY - THE APP HANDLES EVERYTHING
 
-FROM node:18-alpine
+# Use Ubuntu base to avoid Alpine shell issues
+FROM node:18-bullseye
 
 WORKDIR /app
 

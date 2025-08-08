@@ -1,0 +1,1 @@
+web: node scripts/migrate-db.js && npm start

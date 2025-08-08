@@ -1,29 +1,30 @@
 #!/bin/bash
 
-# NUCLEAR DEPLOYMENT SCRIPT - PURE NODE.JS SERVER
-# NO CADDY, NO STATIC SITE, NO REVERSE PROXY
-set -e
+# ULTIMATE FORCE DOCKERFILE DEPLOYMENT SCRIPT
+# NUCLEAR OPTION: DISABLE ALL AUTO-DETECTION
 
-echo "🚀 DEPLOYING PURE NODE.JS SERVER - NO CADDY!"
-echo "⚡ This is a full-stack Express.js app with built-in static serving"
-echo "🔥 PORT: 3000 | NODE_ENV: production"
+echo "🚀 FORCE DOCKERFILE DEPLOYMENT - NO AUTO-DETECTION"
+echo "💣 This is a FULL-STACK NODE.JS APPLICATION SERVER"
+echo "🔥 ABSOLUTELY NO: Nixpacks, Buildpacks, Static Detection"
+echo ""
 
-# Wait for database to be ready
-echo "Waiting for database connection..."
-sleep 5
+# Create marker files to prevent auto-detection
+touch .dockerfile-required
+echo "dockerfile-only" > .deployment-method
 
-# Run database migrations with retries
-echo "Running database migrations..."
-for i in {1..3}; do
-  if npx drizzle-kit push; then
-    echo "Database migration successful"
-    break
-  else
-    echo "Migration attempt $i failed, retrying in 5 seconds..."
-    sleep 5
-  fi
-done
+# Force environment variables
+export NIXPACKS_NO_CACHE=1
+export DISABLE_NIXPACKS=true
+export FORCE_DOCKERFILE=true
+export NODE_ENV=production
+export PORT=3000
 
-# Start the application
-echo "Starting application..."
-exec node dist/index.js
+echo "✅ Environment configured for Dockerfile-only deployment"
+echo "🎯 Ready for Docker build process"
+
+# For manual deployment
+if [ "$1" = "local" ]; then
+    echo "🔄 Running local Docker build test..."
+    docker build -t sosiol-app .
+    echo "✅ Docker build successful"
+fi

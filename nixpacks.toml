@@ -1,21 +1,3 @@
-# Nixpacks configuration to force Node.js deployment without Caddy
-# This prevents Dokploy from treating the app as a static site
-
-# Providers must be an array, not an object!
-providers = ["node"]
-
 [variables]
 NODE_ENV = "production"
 PORT = "3000"
-
-[phases.setup]
-nixPkgs = ["nodejs_18", "npm-9_x"]
-
-[phases.install]
-cmds = ["npm ci"]
-
-[phases.build]
-cmds = ["npm run build"]
-
-[start]
-cmd = "npm start"

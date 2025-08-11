@@ -205,9 +205,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.deleteVote(existingVote.id);
           voteChange = -voteType; // Remove their vote: upvote removal = -1, downvote removal = +1
         } else {
-          // User clicks different vote type: change their vote
-          await storage.updateVote(existingVote.id, voteType);
-          voteChange = voteType - existingVote.voteType; // New vote minus old vote
+          // User clicks different vote type: FIRST remove old vote, user becomes neutral
+          await storage.deleteVote(existingVote.id);
+          voteChange = -existingVote.voteType; // Remove old vote only, don't add new one yet
         }
       } else {
         // User has no existing vote: add new vote

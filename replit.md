@@ -11,12 +11,12 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
-- **2025-08-11**: Implemented proper Reddit-style voting system
-  - ✅ Fixed voting logic to match exact user specification
-  - ✅ Clear upvote/downvote toggle behavior: click same vote removes it
-  - ✅ Vote switching properly handles remove old + add new (±2 change)
-  - ✅ Simple logic: Score = Upvotes - Downvotes, stored per user IP
-  - ✅ Posts start at 1 vote (neutral), can reach 0 votes when downvoted
+- **2025-08-11**: Fixed step-by-step voting behavior 
+  - ✅ Clicking different vote type only removes current vote (becomes neutral)
+  - ✅ Must click again to add the new vote type  
+  - ✅ No more jumping from 2→0, now goes 2→1→0 step by step
+  - ✅ Sequence: Post(1) → Upvote(2) → Downvote(1,neutral) → Downvote(0)
+  - ✅ Smooth user experience with logical vote progression
 - **2025-08-11**: Made entire post cards clickable with preserved functionality
   - ✅ Entire post card now clickable (not just text) for improved UX
   - ✅ Vote buttons work independently without triggering post navigation

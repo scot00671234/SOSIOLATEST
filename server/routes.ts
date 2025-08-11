@@ -202,12 +202,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (voteType === 1) { // User clicks UPVOTE
         if (existingVote) {
           if (existingVote.voteType === 1) {
-            // User already upvoted: DO NOTHING
-            voteChange = 0;
+            // User already upvoted: remove upvote (score -1)
+            await storage.deleteVote(existingVote.id);
+            voteChange = -1;
           } else if (existingVote.voteType === -1) {
-            // User already downvoted: switch to upvote
+            // User had downvote: switch to upvote (score +2)
             await storage.updateVote(existingVote.id, 1);
-            voteChange = 2; // Remove downvote (+1) + add upvote (+1) = +2
+            voteChange = 2; // Remove -1 and add +1 = +2 total
           }
         } else {
           // No existing vote: add upvote (score +1)
@@ -222,12 +223,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (voteType === -1) { // User clicks DOWNVOTE
         if (existingVote) {
           if (existingVote.voteType === -1) {
-            // User already downvoted: DO NOTHING
-            voteChange = 0;
+            // User already downvoted: remove downvote (score +1)
+            await storage.deleteVote(existingVote.id);
+            voteChange = 1;
           } else if (existingVote.voteType === 1) {
-            // User already upvoted: switch to downvote
+            // User had upvote: switch to downvote (score -2)
             await storage.updateVote(existingVote.id, -1);
-            voteChange = -2; // Remove upvote (-1) + add downvote (-1) = -2
+            voteChange = -2; // Remove +1 and add -1 = -2 total
           }
         } else {
           // No existing vote: add downvote (score -1)

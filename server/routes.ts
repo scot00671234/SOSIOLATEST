@@ -12,7 +12,7 @@ let stripe: Stripe | null = null;
 
 if (stripeSecretKey) {
   stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2024-12-18.acacia",
+    apiVersion: "2025-06-30.basil",
   });
 } else {
   console.warn("STRIPE_SECRET_KEY environment variable not set. Stripe payments will be disabled.");
@@ -201,32 +201,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (existingVote) {
         if (existingVote.voteType === voteType) {
-          // User clicked same vote - remove it (toggle off)
+          // User clicked same vote - remove it (toggle off to neutral)
           await storage.deleteVote(existingVote.id);
-          voteChange = voteType === 1 ? -1 : 1; // Remove upvote (-1) or remove downvote (+1)
+          voteChange = -voteType; // Remove upvote (-1) or remove downvote (+1)
         } else {
-          // User changed their vote - first remove old, then add new
-          await storage.deleteVote(existingVote.id);
-          await storage.createVote({
-            ipAddress,
-            targetType,
-            targetId,
-            voteType
-          });
-          // This is a 2-step change: remove old vote + add new vote
-          const oldVoteRemoval = existingVote.voteType === 1 ? -1 : 1;
-          const newVoteAddition = voteType === 1 ? 1 : -1;
-          voteChange = oldVoteRemoval + newVoteAddition;
+          // User switched their vote - update to new vote type
+          await storage.updateVote(existingVote.id, voteType);
+          // Calculate the change: from old vote to new vote
+          voteChange = voteType - existingVote.voteType; // e.g., from -1 to +1 = +2
         }
       } else {
-        // New vote
+        // New vote from neutral state
         await storage.createVote({
           ipAddress,
           targetType,
           targetId,
           voteType
         });
-        voteChange = voteType === 1 ? 1 : -1; // Add upvote (+1) or add downvote (-1)
+        voteChange = voteType; // Add upvote (+1) or add downvote (-1)
       }
 
       // Update target votes
@@ -310,9 +302,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error && typeof error === 'object' && 'type' in error) {
         console.error("Stripe error details:", {
           type: error.type,
-          code: error.code,
-          message: error.message,
-          statusCode: error.statusCode
+          code: (error as any).code,
+          message: (error as any).message,
+          statusCode: (error as any).statusCode
         });
       }
       res.status(500).json({ 

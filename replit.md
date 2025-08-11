@@ -11,6 +11,23 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-08-11**: Fixed Reddit-style voting system
+  - ✅ Posts and comments now start at 0 votes instead of 1
+  - ✅ Implemented proper Reddit-like voting logic (upvote/downvote/toggle)
+  - ✅ Fixed vote switching: upvote to downvote correctly changes by -2
+  - ✅ Toggle behavior: clicking same vote removes it (returns to neutral)
+  - ✅ No vote limits - unlimited users can vote on posts and comments
+  - ✅ Removed "Advertise" button from header navigation as requested
+  - Database schema updated and all existing data migrated successfully
+- **2025-08-11**: Completed Replit Agent to Replit Environment Migration
+  - ✅ PostgreSQL database successfully provisioned and configured
+  - ✅ All Node.js dependencies installed and verified
+  - ✅ Database schema migrated with `npm run db:push` 
+  - ✅ Express server running cleanly on port 5000
+  - ✅ React frontend fully operational with Vite
+  - ✅ All API endpoints tested and working correctly
+  - ✅ Voting system tested and confirmed working like Reddit
+  - Ready for continued development and deployment
 - **2025-01-10**: Fixed VPS deployment SSL connection issue
   - Modified database configuration to disable SSL for production environments
   - Resolved "The server does not support SSL connections" error on Dokploy VPS
@@ -113,4 +130,6 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - Data access layer in `server/storage.ts`
 
 ## User Preferences
-*No specific user preferences recorded yet*
+- Remove "Advertise" button from navigation (completed)
+- Reddit-style voting system behavior required (completed)
+- Unlimited voting capacity needed - no 2-vote maximum (completed)

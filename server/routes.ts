@@ -19,7 +19,24 @@ if (stripeSecretKey) {
 }
 
 function getClientIP(req: any): string {
-  return req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';
+  // Use X-Forwarded-For header first (for proxies), then req.ip (when trust proxy is set)
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    // X-Forwarded-For can contain multiple IPs, take the first one
+    const ip = forwarded.split(',')[0].trim();
+    if (ip) return ip;
+  }
+  
+  // Fallback to Express req.ip (works when trust proxy is enabled)
+  if (req.ip && req.ip !== '::1' && req.ip !== '127.0.0.1') {
+    return req.ip;
+  }
+  
+  // Last resort fallbacks
+  return req.connection?.remoteAddress || 
+         req.socket?.remoteAddress || 
+         req.headers['x-real-ip'] ||
+         `fallback-${Date.now()}-${Math.random()}`; // Generate unique fallback for testing
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {

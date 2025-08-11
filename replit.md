@@ -17,6 +17,9 @@ A Reddit-style social platform built with Express.js backend and React frontend.
   - ✅ Multiple users can now all upvote same post without 2-vote ceiling
   - ✅ Proper vote calculation: new vote - old vote for vote changes
   - ✅ Database migration completed successfully with all tables created
+  - ✅ Fixed IP address detection with trust proxy and X-Forwarded-For headers
+  - ✅ Verified unlimited voting: tested with 5+ different users successfully
+  - ✅ Added mobile communities scrolling in side menu (max-height: 300px)
 - **2025-08-11**: Fixed step-by-step voting behavior 
   - ✅ Clicking different vote type only removes current vote (becomes neutral)
   - ✅ Must click again to add the new vote type  

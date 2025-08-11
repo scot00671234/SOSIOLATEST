@@ -11,6 +11,13 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-08-11**: Made entire post cards clickable with preserved functionality
+  - ✅ Entire post card now clickable (not just text) for improved UX
+  - ✅ Vote buttons work independently without triggering post navigation
+  - ✅ Community name links still navigate to specific communities  
+  - ✅ Share dropdown functions normally without triggering navigation
+  - ✅ Added proper event propagation handling to prevent conflicts
+  - Reddit-style voting logic fully preserved (1→2→1→0 flow)
 - **2025-08-11**: Fixed mobile UI consistency
   - ✅ Hidden communities sidebar on mobile devices completely
   - ✅ Updated mobile menu "Create Post" button to use theme-aware styling

@@ -39,7 +39,11 @@ export default function VoteButton({
     }
   });
 
-  const handleVote = async (voteType: 1 | -1) => {
+  const handleVote = async (e: React.MouseEvent, voteType: 1 | -1) => {
+    // Prevent event bubbling to parent elements (like the post card link)
+    e.preventDefault();
+    e.stopPropagation();
+    
     // Prevent double-clicking
     if (voteMutation.isPending) {
       return;
@@ -64,7 +68,7 @@ export default function VoteButton({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => handleVote(1)}
+        onClick={(e) => handleVote(e, 1)}
         disabled={voteMutation.isPending}
         className={cn(
           "p-1 hover:bg-muted/50 rounded transition-colors",
@@ -90,7 +94,7 @@ export default function VoteButton({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => handleVote(-1)}
+        onClick={(e) => handleVote(e, -1)}
         disabled={voteMutation.isPending}
         className={cn(
           "p-1 hover:bg-muted/50 rounded transition-colors",

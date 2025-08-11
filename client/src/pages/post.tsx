@@ -130,10 +130,12 @@ export default function PostPage() {
       <Header />
       
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <Sidebar />
+        <div className="lg:grid lg:grid-cols-4 lg:gap-6">
+          <div className="hidden lg:block lg:col-span-1">
+            <Sidebar />
+          </div>
           
-          <main className="lg:col-span-3">
+          <main className="w-full lg:col-span-3">
             <div className="space-y-6">
               {/* Post Content */}
               <Card>

@@ -35,12 +35,12 @@ export default function CommunityPage() {
       <Header />
       
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-6">
-          <div className="hidden lg:block">
+        <div className="lg:grid lg:grid-cols-4 lg:gap-6 gap-3 sm:gap-6">
+          <div className="hidden lg:block lg:col-span-1">
             <Sidebar />
           </div>
           
-          <main className="lg:col-span-3">
+          <main className="w-full lg:col-span-3">
             <Card>
               <CardContent className="p-3 sm:p-4">
                 <div className="mb-4 sm:mb-6">

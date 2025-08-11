@@ -34,20 +34,20 @@ export default function Home() {
     return feedItems;
   };
 
-  const feedItems = posts ? createFeedWithAds(posts, currentAd) : [];
+  const feedItems = posts ? createFeedWithAds(posts, currentAd ?? null) : [];
 
   return (
     <div className="min-h-screen bg-background transition-colors">
       <Header />
       
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-6">
-          {/* Sidebar - Hidden on mobile, shown as drawer */}
-          <div className="hidden lg:block">
+        <div className="lg:grid lg:grid-cols-4 lg:gap-6 gap-3 sm:gap-6">
+          {/* Sidebar - Hidden on mobile and tablet, only shown on large screens */}
+          <div className="hidden lg:block lg:col-span-1">
             <Sidebar />
           </div>
           
-          <main className="lg:col-span-3">
+          <main className="w-full lg:col-span-3">
             <Card className="border-border/50 shadow-sm">
               <CardContent className="p-3 sm:p-6">
                 <h2 className="font-semibold text-lg sm:text-xl mb-3 sm:mb-4 tracking-tight">Popular Posts</h2>

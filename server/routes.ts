@@ -199,39 +199,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let voteChange = 0;
       
-      if (existingVote) {
-        if (existingVote.voteType === voteType) {
-          // User clicked same vote - remove it (return to neutral state)
-          await storage.deleteVote(existingVote.id);
-          
-          // Step-wise behavior: remove their vote to go back towards neutral (1)
-          // If they had upvote (+1 from neutral), removing it goes -1 step
-          // If they had downvote (-1 from neutral), removing it goes +1 step  
-          voteChange = -voteType;
-        } else {
-          // User switched their vote (from upvote to downvote or vice versa)
-          await storage.updateVote(existingVote.id, voteType);
-          
-          // Step-wise behavior: switching votes means going -1 step
-          // From upvoted (2) to downvoted (1): -1 step
-          // From downvoted (0) to upvoted (1): +1 step
-          if (existingVote.voteType === 1 && voteType === -1) {
-            voteChange = -1;  // Switch from upvote to downvote: one step down
-          } else if (existingVote.voteType === -1 && voteType === 1) {
-            voteChange = 1;   // Switch from downvote to upvote: one step up
+      if (voteType === 1) { // User clicks UPVOTE
+        if (existingVote) {
+          if (existingVote.voteType === 1) {
+            // User already upvoted: remove upvote (score -1)
+            await storage.deleteVote(existingVote.id);
+            voteChange = -1;
+          } else if (existingVote.voteType === -1) {
+            // User already downvoted: remove downvote (+1) AND add upvote (+1)
+            await storage.updateVote(existingVote.id, 1);
+            voteChange = 2; // Remove downvote (+1) + add upvote (+1) = +2
           }
+        } else {
+          // No existing vote: add upvote (score +1)
+          await storage.createVote({
+            ipAddress,
+            targetType,
+            targetId,
+            voteType: 1
+          });
+          voteChange = 1;
         }
-      } else {
-        // New vote - user voting for first time from neutral state (1)
-        await storage.createVote({
-          ipAddress,
-          targetType,
-          targetId,
-          voteType
-        });
-        
-        // First vote from neutral (1): upvote goes to 2 (+1), downvote goes to 0 (-1)
-        voteChange = voteType;
+      } else if (voteType === -1) { // User clicks DOWNVOTE
+        if (existingVote) {
+          if (existingVote.voteType === -1) {
+            // User already downvoted: remove downvote (score +1)
+            await storage.deleteVote(existingVote.id);
+            voteChange = 1;
+          } else if (existingVote.voteType === 1) {
+            // User already upvoted: remove upvote (-1) AND add downvote (-1)
+            await storage.updateVote(existingVote.id, -1);
+            voteChange = -2; // Remove upvote (-1) + add downvote (-1) = -2
+          }
+        } else {
+          // No existing vote: add downvote (score -1)
+          await storage.createVote({
+            ipAddress,
+            targetType,
+            targetId,
+            voteType: -1
+          });
+          voteChange = -1;
+        }
       }
 
       // Update target votes

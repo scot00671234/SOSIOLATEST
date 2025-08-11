@@ -199,48 +199,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let voteChange = 0;
       
-      if (voteType === 1) { // User clicks UPVOTE
-        if (existingVote) {
-          if (existingVote.voteType === 1) {
-            // User already upvoted: remove upvote (score -1)
-            await storage.deleteVote(existingVote.id);
-            voteChange = -1;
-          } else if (existingVote.voteType === -1) {
-            // User had downvote: switch to upvote (score +2)
-            await storage.updateVote(existingVote.id, 1);
-            voteChange = 2; // Remove -1 and add +1 = +2 total
-          }
+      if (existingVote) {
+        if (existingVote.voteType === voteType) {
+          // User clicks same vote type: remove their vote (toggle off)
+          await storage.deleteVote(existingVote.id);
+          voteChange = -voteType; // Remove their vote: upvote removal = -1, downvote removal = +1
         } else {
-          // No existing vote: add upvote (score +1)
-          await storage.createVote({
-            ipAddress,
-            targetType,
-            targetId,
-            voteType: 1
-          });
-          voteChange = 1;
+          // User clicks different vote type: change their vote
+          await storage.updateVote(existingVote.id, voteType);
+          voteChange = voteType - existingVote.voteType; // New vote minus old vote
         }
-      } else if (voteType === -1) { // User clicks DOWNVOTE
-        if (existingVote) {
-          if (existingVote.voteType === -1) {
-            // User already downvoted: remove downvote (score +1)
-            await storage.deleteVote(existingVote.id);
-            voteChange = 1;
-          } else if (existingVote.voteType === 1) {
-            // User had upvote: switch to downvote (score -2)
-            await storage.updateVote(existingVote.id, -1);
-            voteChange = -2; // Remove +1 and add -1 = -2 total
-          }
-        } else {
-          // No existing vote: add downvote (score -1)
-          await storage.createVote({
-            ipAddress,
-            targetType,
-            targetId,
-            voteType: -1
-          });
-          voteChange = -1;
-        }
+      } else {
+        // User has no existing vote: add new vote
+        await storage.createVote({
+          ipAddress,
+          targetType,
+          targetId,
+          voteType
+        });
+        voteChange = voteType; // Add their vote: upvote = +1, downvote = -1
       }
 
       // Update target votes

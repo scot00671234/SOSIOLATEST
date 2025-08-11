@@ -201,24 +201,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (existingVote) {
         if (existingVote.voteType === voteType) {
-          // User clicked same vote - remove it (toggle off to neutral)
+          // User clicked same vote - remove it (return to neutral)
           await storage.deleteVote(existingVote.id);
-          voteChange = -voteType; // Remove upvote (-1) or remove downvote (+1)
+          voteChange = -voteType; // Remove their contribution: upvote removal (-1), downvote removal (+1)
         } else {
-          // User switched their vote - update to new vote type
+          // User switched their vote
           await storage.updateVote(existingVote.id, voteType);
-          // Calculate the change: from old vote to new vote
-          voteChange = voteType - existingVote.voteType; // e.g., from -1 to +1 = +2
+          // The user wants: if post is at 2 (upvoted) and they click downvote, it goes to 1
+          // This means when switching from upvote to downvote, net change is -1 
+          // When switching from downvote to upvote, net change is +1
+          // This is NOT the mathematical difference (which would be ±2), but the step-wise change
+          if (existingVote.voteType === 1 && voteType === -1) {
+            voteChange = -1;  // From upvoted state to downvoted state: step down by 1
+          } else if (existingVote.voteType === -1 && voteType === 1) {
+            voteChange = 1;   // From downvoted state to upvoted state: step up by 1
+          }
         }
       } else {
-        // New vote from neutral state
+        // New vote - user voting for first time
         await storage.createVote({
           ipAddress,
           targetType,
           targetId,
           voteType
         });
-        voteChange = voteType; // Add upvote (+1) or add downvote (-1)
+        voteChange = voteType; // Their first contribution: +1 for upvote, -1 for downvote
       }
 
       // Update target votes

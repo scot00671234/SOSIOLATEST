@@ -15,7 +15,7 @@ export const posts = pgTable("posts", {
   title: text("title").notNull(),
   content: text("content").notNull(),
   communityId: integer("community_id").notNull().references(() => communities.id),
-  votes: integer("votes").default(0).notNull(),
+  votes: integer("votes").default(1).notNull(),
   commentCount: integer("comment_count").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -25,7 +25,7 @@ export const comments = pgTable("comments", {
   content: text("content").notNull(),
   postId: integer("post_id").notNull().references(() => posts.id),
   parentId: integer("parent_id"),
-  votes: integer("votes").default(0).notNull(),
+  votes: integer("votes").default(1).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

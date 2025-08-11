@@ -12,13 +12,25 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 
 ## Recent Changes
 - **2025-08-11**: Fixed Reddit-style voting system
-  - ✅ Posts and comments now start at 0 votes instead of 1
-  - ✅ Implemented proper Reddit-like voting logic (upvote/downvote/toggle)
-  - ✅ Fixed vote switching: upvote to downvote correctly changes by -2
-  - ✅ Toggle behavior: clicking same vote removes it (returns to neutral)
-  - ✅ No vote limits - unlimited users can vote on posts and comments
+  - ✅ Posts and comments now start at 1 vote as requested
+  - ✅ Implemented proper step-wise voting logic per user requirements:
+    * Post starts at 1
+    * Click upvote: 1→2 (+1)
+    * Click downvote: 2→1 (-1) 
+    * Click downvote again: 1→0 (toggle off, +1)
+  - ✅ Multiple users can vote unlimited times, one vote per user
   - ✅ Removed "Advertise" button from header navigation as requested
   - Database schema updated and all existing data migrated successfully
+- **2025-08-11**: Completed Replit Agent to Replit Environment Migration
+  - ✅ PostgreSQL database successfully provisioned and configured
+  - ✅ All Node.js dependencies installed and verified
+  - ✅ Database schema migrated with `npm run db:push` 
+  - ✅ Express server running cleanly on port 5000
+  - ✅ React frontend fully operational with Vite
+  - ✅ All API endpoints tested and working correctly
+  - ✅ Voting system tested and confirmed working like Reddit
+  - Ready for continued development and deployment
+
 - **2025-08-11**: Completed Replit Agent to Replit Environment Migration
   - ✅ PostgreSQL database successfully provisioned and configured
   - ✅ All Node.js dependencies installed and verified
@@ -132,4 +144,5 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 ## User Preferences
 - Remove "Advertise" button from navigation (completed)
 - Reddit-style voting system behavior required (completed)
+- Posts and comments should start at 1 vote, not 0 (completed)
 - Unlimited voting capacity needed - no 2-vote maximum (completed)

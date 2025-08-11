@@ -20,6 +20,7 @@ A Reddit-style social platform built with Express.js backend and React frontend.
   - ✅ Fixed IP address detection with trust proxy and X-Forwarded-For headers
   - ✅ Verified unlimited voting: tested with 5+ different users successfully
   - ✅ Added mobile communities scrolling in side menu (max-height: 300px)
+  - ✅ Implemented smooth step-by-step voting transitions (no direct upvote→downvote jumps)
 - **2025-08-11**: Fixed step-by-step voting behavior 
   - ✅ Clicking different vote type only removes current vote (becomes neutral)
   - ✅ Must click again to add the new vote type  

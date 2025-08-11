@@ -11,6 +11,12 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-08-11**: Fixed mobile UI consistency
+  - ✅ Hidden communities sidebar on mobile devices completely
+  - ✅ Updated mobile menu "Create Post" button to use theme-aware styling
+  - ✅ Replaced bright blue button with muted background that works in light/dark modes
+  - ✅ Mobile layout now shows only posts without sidebar clutter
+  - All pages (home, community, search, post) now have consistent mobile behavior
 - **2025-08-11**: Fixed Reddit-style voting system
   - ✅ Posts and comments now start at 1 vote as requested
   - ✅ Implemented proper step-wise voting logic per user requirements:

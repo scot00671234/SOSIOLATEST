@@ -192,13 +192,13 @@ export default function Header() {
                         setShowCreatePost(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full justify-start"
+                      className="w-full justify-start bg-muted text-foreground hover:bg-muted/80 transition-all border border-border/50 hover:border-border/80"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Create Post
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       onClick={() => {
                         setShowCreateCommunity(true);
                         setMobileMenuOpen(false);

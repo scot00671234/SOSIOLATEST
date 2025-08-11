@@ -11,6 +11,12 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-08-11**: FIXED CRITICAL VOTING BUG - Multiple users can now vote properly
+  - ✅ Fixed voting system allowing unlimited users to vote (was limited to 2 votes maximum)
+  - ✅ Changed vote switching logic to update existing vote instead of delete-only approach
+  - ✅ Multiple users can now all upvote same post without 2-vote ceiling
+  - ✅ Proper vote calculation: new vote - old vote for vote changes
+  - ✅ Database migration completed successfully with all tables created
 - **2025-08-11**: Fixed step-by-step voting behavior 
   - ✅ Clicking different vote type only removes current vote (becomes neutral)
   - ✅ Must click again to add the new vote type  

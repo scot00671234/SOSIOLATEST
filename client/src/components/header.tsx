@@ -29,7 +29,7 @@ function MobileCommunities({ onCommunityClick }: { onCommunityClick: () => void 
   return (
     <div className="space-y-2">
       <h3 className="font-semibold text-sm text-muted-foreground px-1">Communities</h3>
-      <div className="max-h-[300px] overflow-y-auto space-y-1 pr-2">
+      <div className="max-h-[300px] overflow-y-auto space-y-1 pr-1 custom-scrollbar">
         {communities?.map((community) => (
           <Link 
             key={community.id} 

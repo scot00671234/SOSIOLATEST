@@ -201,31 +201,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (existingVote) {
         if (existingVote.voteType === voteType) {
-          // User clicked same vote - remove it (return to neutral)
+          // User clicked same vote - remove it (return to neutral state)
           await storage.deleteVote(existingVote.id);
-          voteChange = -voteType; // Remove their contribution: upvote removal (-1), downvote removal (+1)
+          
+          // Step-wise behavior: remove their vote to go back towards neutral (1)
+          // If they had upvote (+1 from neutral), removing it goes -1 step
+          // If they had downvote (-1 from neutral), removing it goes +1 step  
+          voteChange = -voteType;
         } else {
-          // User switched their vote
+          // User switched their vote (from upvote to downvote or vice versa)
           await storage.updateVote(existingVote.id, voteType);
-          // The user wants: if post is at 2 (upvoted) and they click downvote, it goes to 1
-          // This means when switching from upvote to downvote, net change is -1 
-          // When switching from downvote to upvote, net change is +1
-          // This is NOT the mathematical difference (which would be ±2), but the step-wise change
+          
+          // Step-wise behavior: switching votes means going -1 step
+          // From upvoted (2) to downvoted (1): -1 step
+          // From downvoted (0) to upvoted (1): +1 step
           if (existingVote.voteType === 1 && voteType === -1) {
-            voteChange = -1;  // From upvoted state to downvoted state: step down by 1
+            voteChange = -1;  // Switch from upvote to downvote: one step down
           } else if (existingVote.voteType === -1 && voteType === 1) {
-            voteChange = 1;   // From downvoted state to upvoted state: step up by 1
+            voteChange = 1;   // Switch from downvote to upvote: one step up
           }
         }
       } else {
-        // New vote - user voting for first time
+        // New vote - user voting for first time from neutral state (1)
         await storage.createVote({
           ipAddress,
           targetType,
           targetId,
           voteType
         });
-        voteChange = voteType; // Their first contribution: +1 for upvote, -1 for downvote
+        
+        // First vote from neutral (1): upvote goes to 2 (+1), downvote goes to 0 (-1)
+        voteChange = voteType;
       }
 
       // Update target votes

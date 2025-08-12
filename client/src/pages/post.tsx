@@ -8,10 +8,11 @@ import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import VoteButton from "@/components/vote-button";
 import Comment from "@/components/comment";
-import CommunityNotes from "@/components/community-notes";
+import CommunityNotesModal from "@/components/community-notes-modal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -45,6 +46,7 @@ export default function PostPage() {
   const postId = parseInt(id || "0");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showCommunityNotes, setShowCommunityNotes] = useState(false);
 
   // Scroll to top when navigating to post page
   useEffect(() => {
@@ -169,8 +171,22 @@ export default function PostPage() {
                         {post.title}
                       </h1>
                       
-                      <div className="prose max-w-none">
+                      <div className="prose max-w-none mb-4">
                         <p className="whitespace-pre-wrap text-foreground">{post.content}</p>
+                      </div>
+                      
+                      {/* Community Notes Button */}
+                      <div className="flex justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowCommunityNotes(true)}
+                          className="text-muted-foreground hover:text-foreground"
+                          data-testid="community-notes-button"
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          Community Notes
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -213,13 +229,6 @@ export default function PostPage() {
                 </CardContent>
               </Card>
               
-              {/* Community Notes Section */}
-              <Card>
-                <CardContent className="p-4">
-                  <CommunityNotes postId={postId} />
-                </CardContent>
-              </Card>
-
               {/* Comments Section */}
               <Card>
                 <CardContent className="p-4">
@@ -260,6 +269,13 @@ export default function PostPage() {
           </main>
         </div>
       </div>
+
+      {/* Community Notes Modal */}
+      <CommunityNotesModal
+        open={showCommunityNotes}
+        onOpenChange={setShowCommunityNotes}
+        postId={postId}
+      />
     </div>
   );
 }

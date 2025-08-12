@@ -11,13 +11,13 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
-- **2025-08-12**: Implemented Community Notes feature with voting system
-  - ✅ Added "Community Notes" section to all post pages
-  - ✅ Users can suggest helpful resources (articles, videos, studies) 
+- **2025-08-12**: Implemented Community Notes feature with clean modal UI
+  - ✅ Added clean "Community Notes" button on each post (bottom right of post content)
+  - ✅ Users can suggest helpful resources (articles, videos, studies) via modal popup
   - ✅ Each note has title, URL, and 200-word comment explaining relevance
   - ✅ Separate voting system for notes independent of post votes
   - ✅ High-scoring resources rise to top, low-scoring sink naturally
-  - ✅ Clean minimalist UI with external link indicators
+  - ✅ Removed clunky card layout - now uses clean modal with scrollable content
   - ✅ Database schema and API endpoints fully implemented
 - **2025-08-12**: Implemented Reddit-style ranking algorithm with sorting controls
   - ✅ Replaced simple vote-based sorting with Reddit hot algorithm

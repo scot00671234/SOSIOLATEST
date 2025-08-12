@@ -84,6 +84,17 @@ async function runMigration() {
         created_at TIMESTAMP DEFAULT NOW() NOT NULL
       );
 
+      -- Create community_notes table
+      CREATE TABLE IF NOT EXISTS community_notes (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        url VARCHAR(500) NOT NULL,
+        comment TEXT NOT NULL,
+        votes INTEGER DEFAULT 1 NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      );
+
       -- Create indexes for performance
       CREATE INDEX IF NOT EXISTS idx_posts_community_id ON posts(community_id);
       CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
@@ -91,6 +102,8 @@ async function runMigration() {
       CREATE INDEX IF NOT EXISTS idx_comments_parent_id ON comments(parent_id);
       CREATE INDEX IF NOT EXISTS idx_votes_target ON votes(target_type, target_id);
       CREATE INDEX IF NOT EXISTS idx_sponsored_ads_active ON sponsored_ads(active);
+      CREATE INDEX IF NOT EXISTS idx_community_notes_post_id ON community_notes(post_id);
+      CREATE INDEX IF NOT EXISTS idx_community_notes_votes ON community_notes(votes DESC);
     `);
 
     console.log('✅ Database migration completed successfully!');
@@ -100,6 +113,7 @@ async function runMigration() {
     console.log('   • comments');
     console.log('   • votes');
     console.log('   • sponsored_ads');
+    console.log('   • community_notes');
     
   } catch (error) {
     console.error('❌ Migration failed:', error);

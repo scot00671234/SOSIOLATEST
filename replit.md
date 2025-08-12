@@ -41,3 +41,8 @@ The platform is built with a clear separation of concerns, using an Express.js b
 - **Database**: PostgreSQL (with Drizzle ORM)
 - **Payment Processing**: Stripe (for advertising system)
 - **Styling**: Tailwind CSS, Radix UI
+
+## Deployment Notes
+- Automatic database migrations configured via `scripts/migrate-db.js`
+- Community Notes table included in production migration script
+- Nixpacks deployment runs migrations automatically before app start

@@ -345,18 +345,16 @@ export default function Header() {
             </div>
             
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Data We Collect</h4>
-              <ul className="list-disc pl-4 space-y-1">
-                <li>IP addresses for voting system integrity (to prevent duplicate votes)</li>
-                <li>Posts and comments you create on the platform</li>
+              <h4 className="font-semibold text-foreground mb-2">Data Policy</h4>
+              <p className="mb-3">
+                We collect minimal information necessary to run Sosiol and keep it fair. This includes:
+              </p>
+              <ul className="list-disc pl-4 space-y-1 mb-3">
+                <li>Temporary technical identifiers (such as IP addresses) to prevent duplicate voting and maintain system integrity.</li>
+                <li>The posts and comments you create on the platform.</li>
               </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-foreground mb-2">Data Usage</h4>
               <p>
-                Your data is used solely to operate the platform. We do not sell, share, or 
-                monetize your personal information with third parties.
+                Your information is used solely to operate the platform.
               </p>
             </div>
             

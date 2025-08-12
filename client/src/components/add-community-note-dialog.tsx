@@ -156,22 +156,13 @@ export default function AddCommunityNoteDialog({
               )}
             />
 
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={createNoteMutation.isPending}
-                data-testid="button-cancel-note"
-                className="border-border text-foreground hover:bg-muted"
-              >
-                Cancel
-              </Button>
+            <div className="flex justify-end pt-4">
               <Button
                 type="submit"
+                variant="outline"
                 disabled={createNoteMutation.isPending || charCount > 200}
                 data-testid="button-submit-note"
-                className="bg-foreground text-background hover:bg-foreground/90"
+                className="border-border text-foreground hover:bg-muted"
               >
                 {createNoteMutation.isPending ? "Adding..." : "Add Note"}
               </Button>

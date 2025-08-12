@@ -52,6 +52,16 @@ export const sponsoredAds = pgTable("sponsored_ads", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const communityNotes = pgTable("community_notes", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => posts.id, { onDelete: "cascade" }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  url: varchar("url", { length: 500 }).notNull(),
+  comment: text("comment").notNull(), // Max 200 words enforced in validation
+  votes: integer("votes").default(1).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Relations
 export const communitiesRelations = relations(communities, ({ many }) => ({
   posts: many(posts),
@@ -63,6 +73,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     references: [communities.id],
   }),
   comments: many(comments),
+  communityNotes: many(communityNotes),
 }));
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
@@ -77,6 +88,13 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
   }),
   children: many(comments, {
     relationName: "parent_child",
+  }),
+}));
+
+export const communityNotesRelations = relations(communityNotes, ({ one }) => ({
+  post: one(posts, {
+    fields: [communityNotes.postId],
+    references: [posts.id],
   }),
 }));
 
@@ -111,6 +129,16 @@ export const insertSponsoredAdSchema = createInsertSchema(sponsoredAds).omit({
   createdAt: true,
 });
 
+export const insertCommunityNoteSchema = createInsertSchema(communityNotes).omit({
+  id: true,
+  votes: true,
+  createdAt: true,
+}).extend({
+  comment: z.string().min(1, "Comment is required").max(1000, "Comment cannot exceed 200 words"),
+  title: z.string().min(1, "Title is required").max(255, "Title too long"),
+  url: z.string().url("Please enter a valid URL"),
+});
+
 export const createAdSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   body: z.string().max(1000, "Body too long").optional(),
@@ -132,12 +160,14 @@ export type Post = typeof posts.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
 export type Vote = typeof votes.$inferSelect;
 export type SponsoredAd = typeof sponsoredAds.$inferSelect;
+export type CommunityNote = typeof communityNotes.$inferSelect;
 
 export type InsertCommunity = z.infer<typeof insertCommunitySchema>;
 export type InsertPost = z.infer<typeof insertPostSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertVote = z.infer<typeof insertVoteSchema>;
 export type InsertSponsoredAd = z.infer<typeof insertSponsoredAdSchema>;
+export type InsertCommunityNote = z.infer<typeof insertCommunityNoteSchema>;
 export type CreateAd = z.infer<typeof createAdSchema>;
 
 // Extended types for joined data
@@ -148,5 +178,9 @@ export type PostWithCommunity = Post & {
 
 export type CommentWithChildren = Comment & {
   children: CommentWithChildren[];
+  userVote?: 1 | -1 | null;
+};
+
+export type CommunityNoteWithVote = CommunityNote & {
   userVote?: 1 | -1 | null;
 };

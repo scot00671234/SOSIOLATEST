@@ -4,18 +4,22 @@ import {
   comments, 
   votes,
   sponsoredAds,
+  communityNotes,
   type Community, 
   type Post, 
   type Comment,
   type Vote,
   type SponsoredAd,
+  type CommunityNote,
   type InsertCommunity, 
   type InsertPost, 
   type InsertComment,
   type InsertVote,
   type InsertSponsoredAd,
+  type InsertCommunityNote,
   type PostWithCommunity,
-  type CommentWithChildren
+  type CommentWithChildren,
+  type CommunityNoteWithVote
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
@@ -59,6 +63,11 @@ export interface IStorage {
   createVote(vote: InsertVote): Promise<Vote>;
   updateVote(id: number, voteType: number): Promise<void>;
   deleteVote(id: number): Promise<void>;
+
+  // Community Notes
+  getCommunityNotes(postId: number): Promise<CommunityNoteWithVote[]>;
+  createCommunityNote(note: InsertCommunityNote): Promise<CommunityNote>;
+  updateCommunityNoteVotes(id: number, votes: number): Promise<void>;
   
   // Search
   search(query: string): Promise<{
@@ -374,6 +383,32 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(sponsoredAds)
       .where(eq(sponsoredAds.stripePaymentIntentId, paymentIntentId));
+  }
+
+  async getCommunityNotes(postId: number): Promise<CommunityNoteWithVote[]> {
+    const notes = await db
+      .select()
+      .from(communityNotes)
+      .where(eq(communityNotes.postId, postId))
+      .orderBy(desc(communityNotes.votes));
+    
+    // For now, return without user votes (will be added when implementing voting)
+    return notes.map(note => ({ ...note, userVote: null as 1 | -1 | null }));
+  }
+
+  async createCommunityNote(insertNote: InsertCommunityNote): Promise<CommunityNote> {
+    const [note] = await db
+      .insert(communityNotes)
+      .values(insertNote)
+      .returning();
+    return note;
+  }
+
+  async updateCommunityNoteVotes(id: number, votes: number): Promise<void> {
+    await db
+      .update(communityNotes)
+      .set({ votes })
+      .where(eq(communityNotes.id, id));
   }
 }
 

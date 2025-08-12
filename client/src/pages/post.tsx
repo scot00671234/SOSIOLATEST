@@ -8,6 +8,7 @@ import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import VoteButton from "@/components/vote-button";
 import Comment from "@/components/comment";
+import CommunityNotes from "@/components/community-notes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -212,6 +213,13 @@ export default function PostPage() {
                 </CardContent>
               </Card>
               
+              {/* Community Notes Section */}
+              <Card>
+                <CardContent className="p-4">
+                  <CommunityNotes postId={postId} />
+                </CardContent>
+              </Card>
+
               {/* Comments Section */}
               <Card>
                 <CardContent className="p-4">

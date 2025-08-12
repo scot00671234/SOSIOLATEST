@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { createAdSchema } from "@shared/schema";
+import { createAdSchema, insertCommunityNoteSchema } from "@shared/schema";
 import { insertCommunitySchema, insertPostSchema, insertCommentSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -414,6 +414,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Webhook error:", error);
       res.status(500).json({ message: "Webhook failed" });
+    }
+  });
+
+  // Get community notes for a post
+  app.get("/api/posts/:postId/notes", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const notes = await storage.getCommunityNotes(postId);
+      res.json(notes);
+    } catch (error) {
+      console.error("Failed to get community notes:", error);
+      res.status(500).json({ message: "Failed to get community notes" });
+    }
+  });
+
+  // Create a new community note
+  app.post("/api/community-notes", async (req, res) => {
+    try {
+      const noteData = insertCommunityNoteSchema.parse(req.body);
+      const note = await storage.createCommunityNote(noteData);
+      res.status(201).json(note);
+    } catch (error) {
+      console.error("Failed to create community note:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid note data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create community note" });
+    }
+  });
+
+  // Vote on community note
+  app.post("/api/community-notes/:id/vote", async (req, res) => {
+    try {
+      const noteId = parseInt(req.params.id);
+      const { voteType } = req.body; // 1 for upvote, -1 for downvote
+      const ipAddress = getClientIP(req);
+
+      if (![-1, 1].includes(voteType)) {
+        return res.status(400).json({ message: "Invalid vote type" });
+      }
+
+      // Get existing vote for this note by this IP
+      const existingVote = await storage.getVote(ipAddress, "community_note", noteId);
+      
+      let voteChange = 0;
+      
+      if (existingVote) {
+        if (existingVote.voteType === voteType) {
+          // Same vote - remove it (toggle off)
+          await storage.deleteVote(existingVote.id);
+          voteChange = -voteType;
+        } else {
+          // Different vote - update it
+          await storage.updateVote(existingVote.id, voteType);
+          voteChange = voteType - existingVote.voteType;
+        }
+      } else {
+        // New vote
+        await storage.createVote({
+          ipAddress,
+          targetType: "community_note",
+          targetId: noteId,
+          voteType
+        });
+        voteChange = voteType;
+      }
+
+      // Get current note to update votes
+      const note = await storage.getCommunityNotes(0).then(notes => notes.find(n => n.id === noteId));
+      if (note) {
+        const newVotes = note.votes + voteChange;
+        await storage.updateCommunityNoteVotes(noteId, newVotes);
+        res.json({ votes: newVotes, userVote: existingVote && existingVote.voteType === voteType ? null : voteType });
+      } else {
+        res.status(404).json({ message: "Community note not found" });
+      }
+    } catch (error) {
+      console.error("Failed to vote on community note:", error);
+      res.status(500).json({ message: "Failed to vote on community note" });
     }
   });
 

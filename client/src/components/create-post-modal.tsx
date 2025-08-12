@@ -143,11 +143,11 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command>
-                        <CommandInput placeholder="Search communities..." />
+                    <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[200px] p-0" align="start" side="bottom" sideOffset={4}>
+                      <Command className="rounded-lg border shadow-md">
+                        <CommandInput placeholder="Search communities..." className="h-9" />
                         <CommandEmpty>No community found.</CommandEmpty>
-                        <CommandGroup>
+                        <CommandGroup className="max-h-[150px] overflow-auto">
                           {communities?.map((community) => (
                             <CommandItem
                               key={community.id}
@@ -156,10 +156,11 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
                                 form.setValue("communityId", community.id.toString());
                                 setCommunityOpen(false);
                               }}
+                              className="flex items-center gap-2 cursor-pointer"
                             >
                               <Check
                                 className={cn(
-                                  "mr-2 h-4 w-4",
+                                  "h-4 w-4",
                                   field.value === community.id.toString()
                                     ? "opacity-100"
                                     : "opacity-0"

@@ -163,6 +163,7 @@ export default function AddCommunityNoteDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={createNoteMutation.isPending}
                 data-testid="button-cancel-note"
+                className="border-border text-foreground hover:bg-muted"
               >
                 Cancel
               </Button>
@@ -170,6 +171,7 @@ export default function AddCommunityNoteDialog({
                 type="submit"
                 disabled={createNoteMutation.isPending || charCount > 200}
                 data-testid="button-submit-note"
+                className="bg-foreground text-background hover:bg-foreground/90"
               >
                 {createNoteMutation.isPending ? "Adding..." : "Add Note"}
               </Button>

@@ -77,7 +77,7 @@ export default function AddCommunityNoteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]" style={{ backgroundColor: 'hsl(var(--bg-light))' }}>
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-foreground">Add Community Note</DialogTitle>
           <DialogDescription className="text-muted-foreground">
@@ -97,7 +97,7 @@ export default function AddCommunityNoteDialog({
                   <FormControl>
                     <Input
                       placeholder="e.g., Comprehensive Guide to React Hooks"
-                      className="bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-border focus:ring-0 focus:ring-offset-0 rounded-lg"
+                      className="bg-card border-border text-foreground placeholder:text-muted-foreground"
                       {...field}
                       data-testid="input-note-title"
                     />
@@ -116,7 +116,7 @@ export default function AddCommunityNoteDialog({
                   <FormControl>
                     <Input
                       placeholder="https://example.com, youtube.com/watch?v=..., /local-path"
-                      className="bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-border focus:ring-0 focus:ring-offset-0 rounded-lg"
+                      className="bg-card border-border text-foreground placeholder:text-muted-foreground"
                       {...field}
                       data-testid="input-note-url"
                     />
@@ -137,7 +137,7 @@ export default function AddCommunityNoteDialog({
                   <FormControl>
                     <Textarea
                       placeholder="Briefly explain why this resource is helpful and relevant..."
-                      className="min-h-[100px] bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-border focus:ring-0 focus:ring-offset-0 rounded-lg"
+                      className="min-h-[100px] bg-card border-border text-foreground placeholder:text-muted-foreground"
                       {...field}
                       onChange={(e) => {
                         const value = handleCommentChange(e.target.value);
@@ -163,7 +163,6 @@ export default function AddCommunityNoteDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={createNoteMutation.isPending}
                 data-testid="button-cancel-note"
-                className="border-border text-foreground hover:bg-muted rounded-lg"
               >
                 Cancel
               </Button>
@@ -171,7 +170,6 @@ export default function AddCommunityNoteDialog({
                 type="submit"
                 disabled={createNoteMutation.isPending || charCount > 200}
                 data-testid="button-submit-note"
-                className="bg-foreground text-background hover:bg-foreground/90 rounded-lg"
               >
                 {createNoteMutation.isPending ? "Adding..." : "Add Note"}
               </Button>

@@ -1,5 +1,6 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import PostCard from "@/components/post-card";
@@ -8,6 +9,11 @@ import type { PostWithCommunity, Community } from "@shared/schema";
 
 export default function CommunityPage() {
   const { id, name } = useParams<{ id?: string; name?: string }>();
+  
+  // Scroll to top when navigating to community page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id, name]);
   
   // Determine if we're using ID or name-based routing
   const isNameBased = !!name;

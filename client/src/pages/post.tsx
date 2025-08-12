@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -44,6 +44,11 @@ export default function PostPage() {
   const postId = parseInt(id || "0");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Scroll to top when navigating to post page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   const { data: post, isLoading: postLoading } = useQuery<PostWithCommunity>({
     queryKey: ["/api/posts", postId],

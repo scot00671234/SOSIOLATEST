@@ -93,17 +93,20 @@ export default function CommunityNotesModal({
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <CardTitle className="text-base font-medium mb-2">
+                            {note.title}
+                          </CardTitle>
+                          <div className="mb-2">
                             <a
                               href={note.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-primary hover:underline"
+                              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
                               data-testid={`note-link-${note.id}`}
                             >
-                              {note.title}
-                              <ExternalLink className="w-4 h-4" />
+                              <span className="truncate max-w-[300px]">{note.url}</span>
+                              <ExternalLink className="w-3 h-3 flex-shrink-0" />
                             </a>
-                          </CardTitle>
+                          </div>
                           <p className="text-sm text-muted-foreground leading-relaxed">
                             {note.comment}
                           </p>

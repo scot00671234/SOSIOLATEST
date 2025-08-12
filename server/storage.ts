@@ -386,11 +386,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCommunityNotes(postId: number): Promise<CommunityNoteWithVote[]> {
-    const notes = await db
-      .select()
-      .from(communityNotes)
-      .where(eq(communityNotes.postId, postId))
-      .orderBy(desc(communityNotes.votes));
+    const query = db.select().from(communityNotes);
+    
+    // If postId is 0, get all notes; otherwise filter by postId
+    const notes = postId === 0 
+      ? await query.orderBy(desc(communityNotes.votes))
+      : await query.where(eq(communityNotes.postId, postId)).orderBy(desc(communityNotes.votes));
     
     // For now, return without user votes (will be added when implementing voting)
     return notes.map(note => ({ ...note, userVote: null as 1 | -1 | null }));

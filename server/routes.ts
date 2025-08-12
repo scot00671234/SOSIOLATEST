@@ -1,9 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
+import { db } from "./db";
 import { storage } from "./storage";
 import { createAdSchema, insertCommunityNoteSchema } from "@shared/schema";
 import { insertCommunitySchema, insertPostSchema, insertCommentSchema } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import { communityNotes } from "@shared/schema";
 import { z } from "zod";
 
 // Initialize Stripe
@@ -481,13 +484,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         voteChange = voteType;
       }
 
-      // Get current note to update votes
-      const note = await storage.getCommunityNotes(0).then(notes => notes.find(n => n.id === noteId));
+      // Get current note to update votes - use storage method instead of direct DB query
+      const allNotes = await storage.getCommunityNotes(0); // Get all notes
+      const note = allNotes.find(n => n.id === noteId);
+      
       if (note) {
         const newVotes = note.votes + voteChange;
         await storage.updateCommunityNoteVotes(noteId, newVotes);
         res.json({ votes: newVotes, userVote: existingVote && existingVote.voteType === voteType ? null : voteType });
       } else {
+        console.error(`Community note with ID ${noteId} not found. Available notes:`, allNotes.map(n => n.id));
         res.status(404).json({ message: "Community note not found" });
       }
     } catch (error) {

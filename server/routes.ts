@@ -465,23 +465,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (existingVote) {
         if (existingVote.voteType === voteType) {
-          // Same vote - remove it (toggle off)
+          // User clicks same vote type: remove their vote (toggle off)
           await storage.deleteVote(existingVote.id);
-          voteChange = -voteType;
+          voteChange = -voteType; // Remove their vote: upvote removal = -1, downvote removal = +1
         } else {
-          // Different vote - update it
-          await storage.updateVote(existingVote.id, voteType);
-          voteChange = voteType - existingVote.voteType;
+          // User clicks different vote type: FIRST remove old vote, user becomes neutral
+          await storage.deleteVote(existingVote.id);
+          voteChange = -existingVote.voteType; // Remove old vote only, don't add new one yet
         }
       } else {
-        // New vote
+        // User has no existing vote: add new vote
         await storage.createVote({
           ipAddress,
           targetType: "community_note",
           targetId: noteId,
           voteType
         });
-        voteChange = voteType;
+        voteChange = voteType; // Add their vote: upvote = +1, downvote = -1
       }
 
       // Get current note to update votes - use storage method instead of direct DB query
@@ -491,7 +491,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (note) {
         const newVotes = note.votes + voteChange;
         await storage.updateCommunityNoteVotes(noteId, newVotes);
-        res.json({ votes: newVotes, userVote: existingVote && existingVote.voteType === voteType ? null : voteType });
+        
+        // Determine current user vote state after this action
+        let userVote = null;
+        if (existingVote) {
+          if (existingVote.voteType === voteType) {
+            // Same vote clicked - vote was removed, user is now neutral
+            userVote = null;
+          } else {
+            // Different vote clicked - old vote was removed, user is now neutral (step-by-step)
+            userVote = null;
+          }
+        } else {
+          // No existing vote - new vote was added
+          userVote = voteType;
+        }
+        
+        res.json({ votes: newVotes, userVote });
       } else {
         console.error(`Community note with ID ${noteId} not found. Available notes:`, allNotes.map(n => n.id));
         res.status(404).json({ message: "Community note not found" });

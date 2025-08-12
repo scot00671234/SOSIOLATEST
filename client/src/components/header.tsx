@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Users, Plus, Moon, Sun, Menu, X, MoreHorizontal, Info, Shield } from "lucide-react";
+import { Search, Users, Plus, Moon, Sun, Menu, X, MoreHorizontal, Info, Shield, AlertTriangle, MessageSquare } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -73,6 +73,8 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [showStaySafe, setShowStaySafe] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   // Update search query when on search page
@@ -189,6 +191,20 @@ export default function Header() {
                     <Shield className="mr-2 h-4 w-4" />
                     <span>Privacy Policy</span>
                   </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowStaySafe(true)}
+                    data-testid="stay-safe-menu-item"
+                  >
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    <span>Stay Safe</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowFeedback(true)}
+                    data-testid="feedback-menu-item"
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    <span>Feedback</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -234,6 +250,20 @@ export default function Header() {
                   >
                     <Shield className="mr-2 h-4 w-4" />
                     <span>Privacy Policy</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowStaySafe(true)}
+                    data-testid="mobile-stay-safe-menu-item"
+                  >
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    <span>Stay Safe</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowFeedback(true)}
+                    data-testid="mobile-feedback-menu-item"
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    <span>Feedback</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -369,6 +399,54 @@ export default function Header() {
             <p className="text-xs text-muted-foreground border-t pt-3">
               Last updated: August 2025
             </p>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+
+      {/* Stay Safe Dialog */}
+      <Dialog open={showStaySafe} onOpenChange={setShowStaySafe}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Stay Safe
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-base leading-relaxed space-y-4">
+            <p>
+              Remember: Sosiol supports free speech, but that doesn't mean your country's laws 
+              will protect you the same way. Know your local laws before posting. Avoid sharing 
+              personal details, and use a VPN if privacy is important to you. Stay smart, stay safe.
+            </p>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+
+      {/* Feedback Dialog */}
+      <Dialog open={showFeedback} onOpenChange={setShowFeedback}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Feedback
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-base leading-relaxed space-y-4">
+            <p>
+              We're always improving Sosiol, and your input matters. Join the Sosiol Feedback 
+              community to share your ideas, report bugs, and suggest features. We read everything 
+              and act on what helps make the platform better.
+            </p>
+            <div className="pt-2 border-t">
+              <Link 
+                href="/c/Sosiol Feedback"
+                onClick={() => setShowFeedback(false)}
+                className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+              >
+                <Users className="h-4 w-4" />
+                Visit Sosiol Feedback Community
+              </Link>
+            </div>
           </DialogDescription>
         </DialogContent>
       </Dialog>

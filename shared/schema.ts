@@ -136,7 +136,10 @@ export const insertCommunityNoteSchema = createInsertSchema(communityNotes).omit
 }).extend({
   comment: z.string().min(1, "Comment is required").max(200, "Comment cannot exceed 200 characters"),
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
-  url: z.string().url("Please enter a valid URL"),
+  url: z.string().min(1, "URL is required").refine((val) => {
+    // Allow various link formats: full URLs, domain names, or paths
+    return val.includes('.') || val.startsWith('/') || val.startsWith('http');
+  }, "Please enter a valid URL, domain, or path"),
 });
 
 export const createAdSchema = z.object({

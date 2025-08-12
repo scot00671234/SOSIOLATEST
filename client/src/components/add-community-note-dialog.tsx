@@ -115,8 +115,7 @@ export default function AddCommunityNoteDialog({
                   <FormLabel className="text-foreground">URL</FormLabel>
                   <FormControl>
                     <Input
-                      type="url"
-                      placeholder="https://example.com/article"
+                      placeholder="https://example.com, youtube.com/watch?v=..., /local-path"
                       className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                       {...field}
                       data-testid="input-note-url"
@@ -171,7 +170,7 @@ export default function AddCommunityNoteDialog({
                 type="submit"
                 disabled={createNoteMutation.isPending || charCount > 200}
                 data-testid="button-submit-note"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-foreground text-background hover:bg-foreground/90"
               >
                 {createNoteMutation.isPending ? "Adding..." : "Add Note"}
               </Button>

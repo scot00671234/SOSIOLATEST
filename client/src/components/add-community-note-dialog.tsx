@@ -97,7 +97,7 @@ export default function AddCommunityNoteDialog({
                   <FormControl>
                     <Input
                       placeholder="e.g., Comprehensive Guide to React Hooks"
-                      className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-border focus:ring-0 focus:ring-offset-0"
                       {...field}
                       data-testid="input-note-title"
                     />
@@ -116,7 +116,7 @@ export default function AddCommunityNoteDialog({
                   <FormControl>
                     <Input
                       placeholder="https://example.com, youtube.com/watch?v=..., /local-path"
-                      className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-border focus:ring-0 focus:ring-offset-0"
                       {...field}
                       data-testid="input-note-url"
                     />
@@ -137,7 +137,7 @@ export default function AddCommunityNoteDialog({
                   <FormControl>
                     <Textarea
                       placeholder="Briefly explain why this resource is helpful and relevant..."
-                      className="min-h-[100px] bg-background border-border text-foreground placeholder:text-muted-foreground"
+                      className="min-h-[100px] bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-border focus:ring-0 focus:ring-offset-0"
                       {...field}
                       onChange={(e) => {
                         const value = handleCommentChange(e.target.value);
@@ -163,6 +163,7 @@ export default function AddCommunityNoteDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={createNoteMutation.isPending}
                 data-testid="button-cancel-note"
+                className="border-border text-foreground hover:bg-muted"
               >
                 Cancel
               </Button>

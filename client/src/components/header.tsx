@@ -441,7 +441,7 @@ export default function Header() {
               <Link 
                 href="/c/Sosiol Feedback"
                 onClick={() => setShowFeedback(false)}
-                className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium text-sm"
               >
                 <Users className="h-4 w-4" />
                 Visit Sosiol Feedback Community

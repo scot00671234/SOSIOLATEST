@@ -27,7 +27,7 @@ export default function CommunityPage() {
 
   // Find community by either ID or name
   const community = isNameBased 
-    ? communities?.find(c => c.name === name)
+    ? communities?.find(c => c.name === decodeURIComponent(name || ''))
     : communities?.find(c => c.id === communityId);
 
   const actualCommunityId = community?.id || 0;

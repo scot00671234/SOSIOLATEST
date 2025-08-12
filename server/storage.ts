@@ -20,6 +20,21 @@ import {
 import { db } from "./db";
 import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
 
+// Reddit-style hot algorithm
+function calculateHotScore(votes: number, createdAt: Date): number {
+  const score = votes;
+  const order = Math.log10(Math.max(Math.abs(score), 1));
+  const sign = score > 0 ? 1 : (score < 0 ? -1 : 0);
+  
+  // Convert to seconds since epoch (Reddit uses December 8, 2005 as epoch: 1134028003)
+  // We'll use January 1, 2020 as our epoch for simplicity: 1577836800
+  const epochSeconds = Math.floor(createdAt.getTime() / 1000) - 1577836800;
+  
+  // The 45000 divisor controls how much time matters vs votes
+  // Smaller number = time matters more, larger = votes matter more  
+  return Math.round((sign * order + epochSeconds / 45000) * 10000000) / 10000000;
+}
+
 export interface IStorage {
   // Communities
   getCommunities(): Promise<Community[]>;
@@ -81,18 +96,31 @@ export class DatabaseStorage implements IStorage {
     const query = db
       .select()
       .from(posts)
-      .leftJoin(communities, eq(posts.communityId, communities.id))
-      .orderBy(desc(posts.votes), desc(posts.createdAt));
+      .leftJoin(communities, eq(posts.communityId, communities.id));
     
+    let result;
     if (communityId) {
-      query.where(eq(posts.communityId, communityId));
+      result = await query.where(eq(posts.communityId, communityId));
+    } else {
+      result = await query;
     }
     
-    const result = await query;
-    return result.map(row => ({
-      ...row.posts,
-      community: row.communities!
-    }));
+    // Calculate hot scores and sort using Reddit algorithm
+    const postsWithScores = result.map(row => {
+      const post = row.posts;
+      const hotScore = calculateHotScore(post.votes, new Date(post.createdAt));
+      return {
+        ...post,
+        community: row.communities!,
+        hotScore
+      };
+    });
+    
+    // Sort by hot score (highest first)
+    postsWithScores.sort((a, b) => b.hotScore - a.hotScore);
+    
+    // Remove hotScore from final result
+    return postsWithScores.map(({ hotScore, ...post }) => post);
   }
 
   async getPost(id: number): Promise<PostWithCommunity | undefined> {
@@ -247,7 +275,7 @@ export class DatabaseStorage implements IStorage {
             ilike(posts.content, searchTerm)
           )
         )
-        .orderBy(desc(posts.votes)),
+        .orderBy(desc(posts.createdAt)),
       
       // Search communities
       db
@@ -268,11 +296,22 @@ export class DatabaseStorage implements IStorage {
         .orderBy(desc(comments.votes))
     ]);
 
+    // Apply hot algorithm to search results
+    const postsWithScores = searchPosts.map(row => {
+      const post = row.posts;
+      const hotScore = calculateHotScore(post.votes, new Date(post.createdAt));
+      return {
+        ...post,
+        community: row.communities!,
+        hotScore
+      };
+    });
+    
+    // Sort by hot score
+    postsWithScores.sort((a, b) => b.hotScore - a.hotScore);
+
     return {
-      posts: searchPosts.map(row => ({
-        ...row.posts,
-        community: row.communities!
-      })),
+      posts: postsWithScores.map(({ hotScore, ...post }) => post),
       communities: searchCommunities,
       comments: searchComments
     };

@@ -1,14 +1,19 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import PostCard from "@/components/post-card";
 import SponsoredAdComponent from "@/components/sponsored-ad";
+import SortMenu from "@/components/sort-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PostWithCommunity, SponsoredAd } from "@shared/schema";
 
 export default function Home() {
+  const [sort, setSort] = useState<'hot' | 'new'>('hot');
+  
   const { data: posts, isLoading } = useQuery<PostWithCommunity[]>({
-    queryKey: ["/api/posts"],
+    queryKey: ["/api/posts", { sort }],
+    queryFn: () => fetch(`/api/posts?sort=${sort}`).then(res => res.json()),
   });
 
   const { data: currentAd } = useQuery<SponsoredAd | null>({
@@ -50,7 +55,16 @@ export default function Home() {
           <main className="w-full lg:col-span-3">
             <Card className="border-border/50 shadow-sm">
               <CardContent className="p-3 sm:p-6">
-                <h2 className="font-semibold text-lg sm:text-xl mb-3 sm:mb-4 tracking-tight">Popular Posts</h2>
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h2 className="font-semibold text-lg sm:text-xl tracking-tight">
+                    {sort === 'hot' ? 'Hot Posts' : 'New Posts'}
+                  </h2>
+                  <SortMenu 
+                    currentSort={sort} 
+                    onSortChange={setSort}
+                    className="mb-0"
+                  />
+                </div>
                 
                 {isLoading ? (
                   <div className="space-y-3 sm:space-y-4">

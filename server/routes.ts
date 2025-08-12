@@ -98,8 +98,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/posts", async (req, res) => {
     try {
       const communityId = req.query.communityId ? parseInt(req.query.communityId as string) : undefined;
+      const sort = (req.query.sort as 'hot' | 'new') || 'hot';
       const ipAddress = getClientIP(req);
-      const posts = await storage.getPosts(communityId);
+      const posts = await storage.getPosts(communityId, sort);
       
       // Add user vote information
       const postsWithVotes = await Promise.all(

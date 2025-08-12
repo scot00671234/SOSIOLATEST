@@ -1,14 +1,16 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import PostCard from "@/components/post-card";
+import SortMenu from "@/components/sort-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PostWithCommunity, Community } from "@shared/schema";
 
 export default function CommunityPage() {
   const { id, name } = useParams<{ id?: string; name?: string }>();
+  const [sort, setSort] = useState<'hot' | 'new'>('hot');
   
   // Scroll to top when navigating to community page
   useEffect(() => {
@@ -31,8 +33,8 @@ export default function CommunityPage() {
   const actualCommunityId = community?.id || 0;
 
   const { data: posts, isLoading: postsLoading } = useQuery<PostWithCommunity[]>({
-    queryKey: ["/api/posts", { communityId: actualCommunityId }],
-    queryFn: () => fetch(`/api/posts?communityId=${actualCommunityId}`).then(res => res.json()),
+    queryKey: ["/api/posts", { communityId: actualCommunityId, sort }],
+    queryFn: () => fetch(`/api/posts?communityId=${actualCommunityId}&sort=${sort}`).then(res => res.json()),
     enabled: !!actualCommunityId,
   });
 
@@ -50,12 +52,21 @@ export default function CommunityPage() {
             <Card>
               <CardContent className="p-3 sm:p-4">
                 <div className="mb-4 sm:mb-6">
-                  <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">
-                    {community?.name || "Community"}
-                  </h1>
-                  <p className="text-muted-foreground text-sm sm:text-base">
-                    Posts from this community
-                  </p>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">
+                        {community?.name || "Community"}
+                      </h1>
+                      <p className="text-muted-foreground text-sm sm:text-base">
+                        Posts from this community
+                      </p>
+                    </div>
+                    <SortMenu 
+                      currentSort={sort} 
+                      onSortChange={setSort}
+                      className="mb-0 ml-4"
+                    />
+                  </div>
                 </div>
                 
                 {postsLoading ? (

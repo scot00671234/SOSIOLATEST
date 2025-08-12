@@ -42,7 +42,7 @@ export interface IStorage {
   createCommunity(community: InsertCommunity): Promise<Community>;
   
   // Posts
-  getPosts(communityId?: number): Promise<PostWithCommunity[]>;
+  getPosts(communityId?: number, sort?: 'hot' | 'new'): Promise<PostWithCommunity[]>;
   getPost(id: number): Promise<PostWithCommunity | undefined>;
   createPost(post: InsertPost): Promise<Post>;
   updatePostVotes(id: number, votes: number): Promise<void>;
@@ -92,7 +92,7 @@ export class DatabaseStorage implements IStorage {
     return community;
   }
 
-  async getPosts(communityId?: number): Promise<PostWithCommunity[]> {
+  async getPosts(communityId?: number, sort: 'hot' | 'new' = 'hot'): Promise<PostWithCommunity[]> {
     const query = db
       .select()
       .from(posts)
@@ -105,22 +105,29 @@ export class DatabaseStorage implements IStorage {
       result = await query;
     }
     
-    // Calculate hot scores and sort using Reddit algorithm
-    const postsWithScores = result.map(row => {
-      const post = row.posts;
-      const hotScore = calculateHotScore(post.votes, new Date(post.createdAt));
-      return {
-        ...post,
-        community: row.communities!,
-        hotScore
-      };
-    });
+    const postsWithCommunity = result.map(row => ({
+      ...row.posts,
+      community: row.communities!
+    }));
     
-    // Sort by hot score (highest first)
-    postsWithScores.sort((a, b) => b.hotScore - a.hotScore);
-    
-    // Remove hotScore from final result
-    return postsWithScores.map(({ hotScore, ...post }) => post);
+    if (sort === 'new') {
+      // Sort by creation date (newest first)
+      return postsWithCommunity.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    } else {
+      // Calculate hot scores and sort using Reddit algorithm
+      const postsWithScores = postsWithCommunity.map(post => {
+        const hotScore = calculateHotScore(post.votes, new Date(post.createdAt));
+        return { ...post, hotScore };
+      });
+      
+      // Sort by hot score (highest first)
+      postsWithScores.sort((a, b) => b.hotScore - a.hotScore);
+      
+      // Remove hotScore from final result
+      return postsWithScores.map(({ hotScore, ...post }) => post);
+    }
   }
 
   async getPost(id: number): Promise<PostWithCommunity | undefined> {

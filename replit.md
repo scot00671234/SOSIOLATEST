@@ -11,6 +11,14 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-08-12**: Implemented Reddit-style ranking algorithm with sorting controls
+  - ✅ Replaced simple vote-based sorting with Reddit hot algorithm
+  - ✅ Added Hot/New sorting menu to home page and community pages
+  - ✅ Hot algorithm combines votes and time with logarithmic scaling
+  - ✅ Early votes matter exponentially more (first 10 = next 100 = next 1000)
+  - ✅ New sorting shows posts by creation date (newest first)
+  - ✅ Clean minimalist sorting UI with active state indicators
+  - ✅ Backend supports sort parameter for API endpoints
 - **2025-08-12**: Fixed community navigation scroll behavior
   - ✅ Added scroll-to-top functionality when navigating to community pages
   - ✅ Fixed community dropdown alignment in Create Post modal

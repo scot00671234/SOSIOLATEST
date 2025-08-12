@@ -349,7 +349,6 @@ export default function Header() {
               <ul className="list-disc pl-4 space-y-1">
                 <li>IP addresses for voting system integrity (to prevent duplicate votes)</li>
                 <li>Posts and comments you create on the platform</li>
-                <li>Basic usage analytics to improve the service</li>
               </ul>
             </div>
             
@@ -364,8 +363,8 @@ export default function Header() {
             <div>
               <h4 className="font-semibold text-foreground mb-2">Content Policy</h4>
               <p>
-                While we support free speech, content that is illegal, violates others' rights, 
-                or promotes harm may be removed at our discretion.
+                While we support free speech, content that is illegal according to US law, 
+                will be removed at our discretion.
               </p>
             </div>
             

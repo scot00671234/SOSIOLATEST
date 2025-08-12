@@ -1,10 +1,23 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Users, Plus, Moon, Sun, Menu, X } from "lucide-react";
+import { Search, Users, Plus, Moon, Sun, Menu, X, MoreHorizontal, Info, Shield } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import CreatePostModal from "./create-post-modal";
 import CreateCommunityModal from "./create-community-modal";
 import { useQuery } from "@tanstack/react-query";
@@ -58,6 +71,8 @@ export default function Header() {
   const [showCreateCommunity, setShowCreateCommunity] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   // Update search query when on search page
@@ -146,6 +161,36 @@ export default function Header() {
                 <Plus className="h-4 w-4 mr-2" />
                 <span className="hidden lg:inline">Post</span>
               </Button>
+
+              {/* Three-dot menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                    data-testid="menu-button"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem 
+                    onClick={() => setShowAbout(true)}
+                    data-testid="about-menu-item"
+                  >
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>About</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowPrivacyPolicy(true)}
+                    data-testid="privacy-menu-item"
+                  >
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Privacy Policy</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Mobile Menu Button */}
@@ -162,6 +207,37 @@ export default function Header() {
                   <Sun className="h-4 w-4" />
                 )}
               </Button>
+              
+              {/* Mobile three-dot menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                    data-testid="mobile-menu-button"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem 
+                    onClick={() => setShowAbout(true)}
+                    data-testid="mobile-about-menu-item"
+                  >
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>About</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowPrivacyPolicy(true)}
+                    data-testid="mobile-privacy-menu-item"
+                  >
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Privacy Policy</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button
@@ -227,6 +303,78 @@ export default function Header() {
         open={showCreateCommunity} 
         onOpenChange={setShowCreateCommunity} 
       />
+
+      {/* About Dialog */}
+      <Dialog open={showAbout} onOpenChange={setShowAbout}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              About Sosiol
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-base leading-relaxed space-y-4">
+            <p>
+              Sosiol is a free speech platform designed for open and anonymous discussions. 
+              Share your thoughts, create communities, and engage in meaningful conversations 
+              without barriers.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Built with privacy and community in mind.
+            </p>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+
+      {/* Privacy Policy Dialog */}
+      <Dialog open={showPrivacyPolicy} onOpenChange={setShowPrivacyPolicy}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Privacy Policy
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-sm leading-relaxed space-y-3">
+            <div>
+              <h4 className="font-semibold text-foreground mb-2">Anonymous Social Media</h4>
+              <p>
+                Sosiol is designed as an anonymous social platform. We do not require or collect 
+                personal information such as names, emails, or phone numbers for basic usage.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-foreground mb-2">Data We Collect</h4>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>IP addresses for voting system integrity (to prevent duplicate votes)</li>
+                <li>Posts and comments you create on the platform</li>
+                <li>Basic usage analytics to improve the service</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-foreground mb-2">Data Usage</h4>
+              <p>
+                Your data is used solely to operate the platform. We do not sell, share, or 
+                monetize your personal information with third parties.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-foreground mb-2">Content Policy</h4>
+              <p>
+                While we support free speech, content that is illegal, violates others' rights, 
+                or promotes harm may be removed at our discretion.
+              </p>
+            </div>
+            
+            <p className="text-xs text-muted-foreground border-t pt-3">
+              Last updated: August 2025
+            </p>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

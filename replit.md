@@ -11,6 +11,16 @@ A Reddit-style social platform built with Express.js backend and React frontend.
 - **Styling**: Tailwind CSS with Radix UI components
 
 ## Recent Changes
+- **2025-08-12**: Successfully completed Replit Agent to Environment migration
+  - ✅ PostgreSQL database provisioned and connected
+  - ✅ All Node.js dependencies verified and working
+  - ✅ Database schema pushed with all 5 tables created
+  - ✅ Express server running on port 5000
+  - ✅ React frontend fully operational with Vite hot reloading
+  - ✅ Added three-dot menu to header with About and Privacy Policy modals
+  - ✅ About modal describes Sosiol as free speech platform
+  - ✅ Privacy Policy covers anonymous usage, data collection, and content policy
+  - Ready for continued development and new features
 - **2025-08-11**: FIXED CRITICAL VOTING BUG - Multiple users can now vote properly
   - ✅ Fixed voting system allowing unlimited users to vote (was limited to 2 votes maximum)
   - ✅ Changed vote switching logic to update existing vote instead of delete-only approach

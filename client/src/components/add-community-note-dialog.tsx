@@ -12,9 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { insertCommunityNoteSchema } from "@shared/schema";
 import { z } from "zod";
 
-const noteFormSchema = insertCommunityNoteSchema.extend({
-  comment: z.string().min(1, "Comment is required").max(1000, "Comment cannot exceed 1000 characters")
-});
+const noteFormSchema = insertCommunityNoteSchema;
 
 type NoteFormData = z.infer<typeof noteFormSchema>;
 
@@ -30,7 +28,7 @@ export default function AddCommunityNoteDialog({
   postId 
 }: AddCommunityNoteDialogProps) {
   const { toast } = useToast();
-  const [wordCount, setWordCount] = useState(0);
+  const [charCount, setCharCount] = useState(0);
 
   const form = useForm<NoteFormData>({
     resolver: zodResolver(noteFormSchema),
@@ -53,7 +51,7 @@ export default function AddCommunityNoteDialog({
       queryClient.invalidateQueries({ queryKey: [`/api/posts/${postId}/notes`] });
       onOpenChange(false);
       form.reset();
-      setWordCount(0);
+      setCharCount(0);
       toast({
         title: "Community note added",
         description: "Your resource has been added to help other users.",
@@ -69,8 +67,7 @@ export default function AddCommunityNoteDialog({
   });
 
   const handleCommentChange = (value: string) => {
-    const words = value.trim() ? value.trim().split(/\s+/).length : 0;
-    setWordCount(words);
+    setCharCount(value.length);
     return value;
   };
 
@@ -80,10 +77,10 @@ export default function AddCommunityNoteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-background border-border">
         <DialogHeader>
-          <DialogTitle>Add Community Note</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-foreground">Add Community Note</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Suggest a helpful resource (article, video, study) related to this post. 
             High-quality resources will be voted up by the community.
           </DialogDescription>
@@ -96,10 +93,11 @@ export default function AddCommunityNoteDialog({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Resource Title</FormLabel>
+                  <FormLabel className="text-foreground">Resource Title</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g., Comprehensive Guide to React Hooks"
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                       {...field}
                       data-testid="input-note-title"
                     />
@@ -114,11 +112,12 @@ export default function AddCommunityNoteDialog({
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>URL</FormLabel>
+                  <FormLabel className="text-foreground">URL</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
                       placeholder="https://example.com/article"
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                       {...field}
                       data-testid="input-note-url"
                     />
@@ -133,13 +132,13 @@ export default function AddCommunityNoteDialog({
               name="comment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Comment ({wordCount}/200 words)
+                  <FormLabel className="text-foreground">
+                    Comment ({charCount}/200 characters)
                   </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Briefly explain why this resource is helpful and relevant..."
-                      className="min-h-[100px]"
+                      className="min-h-[100px] bg-background border-border text-foreground placeholder:text-muted-foreground"
                       {...field}
                       onChange={(e) => {
                         const value = handleCommentChange(e.target.value);
@@ -149,9 +148,9 @@ export default function AddCommunityNoteDialog({
                     />
                   </FormControl>
                   <FormMessage />
-                  {wordCount > 200 && (
+                  {charCount > 200 && (
                     <p className="text-sm text-destructive">
-                      Comment exceeds 200 word limit
+                      Comment exceeds 200 character limit
                     </p>
                   )}
                 </FormItem>
@@ -170,8 +169,9 @@ export default function AddCommunityNoteDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={createNoteMutation.isPending || wordCount > 200}
+                disabled={createNoteMutation.isPending || charCount > 200}
                 data-testid="button-submit-note"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {createNoteMutation.isPending ? "Adding..." : "Add Note"}
               </Button>

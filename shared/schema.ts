@@ -134,7 +134,7 @@ export const insertCommunityNoteSchema = createInsertSchema(communityNotes).omit
   votes: true,
   createdAt: true,
 }).extend({
-  comment: z.string().min(1, "Comment is required").max(1000, "Comment cannot exceed 200 words"),
+  comment: z.string().min(1, "Comment is required").max(200, "Comment cannot exceed 200 characters"),
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
   url: z.string().url("Please enter a valid URL"),
 });

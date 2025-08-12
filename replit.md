@@ -8,6 +8,8 @@ This project is a Reddit-style social platform enabling users to create and join
 - Reddit-style voting system behavior required
 - Posts and comments should start at 1 vote, not 0
 - Unlimited voting capacity needed - no 2-vote maximum
+- Clean, minimalist UI styling for Community Notes feature
+- Subtle outline button styling preferred over bold colors
 
 ## System Architecture
 The platform is built with a clear separation of concerns, using an Express.js backend with TypeScript and a React frontend with Vite. Data persistence is handled by PostgreSQL with Drizzle ORM.
@@ -18,7 +20,7 @@ The platform is built with a clear separation of concerns, using an Express.js b
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database interactions.
 - **Authentication**: Session-based authentication with IP tracking for a unique voting system that does not require user accounts.
 - **Voting System**: Implements a Reddit-style "hot" ranking algorithm combining votes and time, alongside a "new" sorting option. Votes are IP-based, allowing for unlimited voting from different IPs on the same post. Posts and comments start with a score of 1.
-- **Community Notes**: Allows users to suggest helpful resources on posts via a modal, with each note having its own title, URL, and a 200-word comment. Notes have an independent voting system, where high-scoring resources rise to the top.
+- **Community Notes**: Allows users to suggest helpful resources on posts via a modal, with each note having its own title, URL, and a 200-word comment. Notes have an independent voting system with step-by-step voting transitions, where high-scoring resources rise to the top. Features clean UI styling that matches the site theme.
 - **Advertising System**: A text-based ad system with Stripe integration allows users to purchase impressions. Ads are injected every 10 posts in the main feed, with impression tracking and automatic deactivation upon reaching paid impression limits. Sponsored ads are distinctly styled and labeled.
 - **UI/UX Decisions**:
     - Minimalist design theme with adaptable styling for light/dark modes.

@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -8,6 +8,10 @@ import type { Community } from "@shared/schema";
 
 export default function Sidebar() {
   const [sortBy, setSortBy] = useState<'alphabetic' | 'popular' | 'new'>('popular');
+  const [location] = useLocation();
+  
+  // Check if we're on a post page (format: /post/id or /post/id/title)
+  const isPostPage = location.startsWith('/post/');
   
   const { data: communities, isLoading } = useQuery<Community[]>({
     queryKey: ["/api/communities", sortBy],
@@ -19,10 +23,16 @@ export default function Sidebar() {
       <aside className="lg:col-span-1 min-w-0">
         <Card className="overflow-hidden">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg">Communities</h3>
-              <div className="w-16 h-7 bg-muted rounded animate-pulse" />
-            </div>
+            {!isPostPage ? (
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-lg">Communities</h3>
+                <div className="w-16 h-7 bg-muted rounded animate-pulse" />
+              </div>
+            ) : (
+              <div className="mb-4">
+                <h3 className="font-semibold text-lg">Communities</h3>
+              </div>
+            )}
             <div className="space-y-2">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="h-8 bg-muted rounded animate-pulse" />
@@ -38,19 +48,25 @@ export default function Sidebar() {
     <aside className="lg:col-span-1 min-w-0">
       <Card className="overflow-hidden">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg">Communities</h3>
-            <Select value={sortBy} onValueChange={(value: 'alphabetic' | 'popular' | 'new') => setSortBy(value)}>
-              <SelectTrigger className="w-[70px] h-7 text-xs border-0 shadow-none p-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="popular">Popular</SelectItem>
-                <SelectItem value="alphabetic">A-Z</SelectItem>
-                <SelectItem value="new">New</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {!isPostPage ? (
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-lg">Communities</h3>
+              <Select value={sortBy} onValueChange={(value: 'alphabetic' | 'popular' | 'new') => setSortBy(value)}>
+                <SelectTrigger className="w-[100px] h-9 text-sm border border-border shadow-sm p-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="popular">Popular</SelectItem>
+                  <SelectItem value="alphabetic">A-Z</SelectItem>
+                  <SelectItem value="new">New</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div className="mb-4">
+              <h3 className="font-semibold text-lg">Communities</h3>
+            </div>
+          )}
           
           <div className="space-y-2">
             {communities?.map((community) => (

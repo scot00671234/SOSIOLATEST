@@ -52,7 +52,7 @@ export default function Sidebar() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-lg">Communities</h3>
               <Select value={sortBy} onValueChange={(value: 'alphabetic' | 'popular' | 'new') => setSortBy(value)}>
-                <SelectTrigger className="w-[100px] h-9 text-sm border border-border shadow-sm p-2">
+                <SelectTrigger className="w-[85px] h-8 text-sm border border-border shadow-sm px-3 py-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

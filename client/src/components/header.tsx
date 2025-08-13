@@ -46,7 +46,7 @@ function MobileCommunities({ onCommunityClick }: { onCommunityClick: () => void 
         {communities?.map((community) => (
           <Link 
             key={community.id} 
-            href={`/c/${community.name}`}
+            href={`/c/${encodeURIComponent(community.name)}`}
             onClick={onCommunityClick}
             className="block py-2 px-3 text-sm hover:bg-muted rounded-lg transition-colors"
           >
@@ -439,7 +439,7 @@ export default function Header() {
             </p>
             <div className="pt-2 border-t">
               <Link 
-                href="/c/Sosiol Feedback"
+                href="/c/Sosiol%20Feedback"
                 onClick={() => setShowFeedback(false)}
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium text-sm"
               >

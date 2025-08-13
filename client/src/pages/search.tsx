@@ -97,7 +97,7 @@ export default function SearchPage() {
                           </h3>
                           <div className="space-y-2">
                             {searchResults.communities.map((community) => (
-                              <Link key={community.id} href={`/c/${community.name}`}>
+                              <Link key={community.id} href={`/c/${encodeURIComponent(community.name)}`}>
                                 <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                                   <CardContent className="p-3">
                                     <div className="flex items-center justify-between">

@@ -56,7 +56,7 @@ export default function Sidebar() {
             {communities?.map((community) => (
               <Link 
                 key={community.id} 
-                href={`/c/${community.name}`}
+                href={`/c/${encodeURIComponent(community.name)}`}
                 className="flex items-center py-2 px-3 text-sm hover:bg-muted rounded-lg transition-colors min-w-0"
               >
                 <Users className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0" />

@@ -84,7 +84,7 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getCommunities(sort: 'alphabetic' | 'new' | 'popular' = 'alphabetic'): Promise<Community[]> {
+  async getCommunities(sort: 'alphabetic' | 'new' | 'popular' = 'popular'): Promise<Community[]> {
     if (sort === 'new') {
       return await db.select().from(communities).orderBy(desc(communities.createdAt));
     } else if (sort === 'popular') {

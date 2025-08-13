@@ -136,9 +136,30 @@ export const insertCommunityNoteSchema = createInsertSchema(communityNotes).omit
 }).extend({
   comment: z.string().min(1, "Comment is required").max(200, "Comment cannot exceed 200 characters"),
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
-  url: z.string().min(1, "URL is required").refine((val) => {
-    // Allow various link formats: full URLs, domain names, or paths
-    return val.includes('.') || val.startsWith('/') || val.startsWith('http');
+  url: z.string().min(1, "URL is required").transform((val) => {
+    // Handle different URL formats and automatically add protocol
+    const trimmed = val.trim();
+    
+    // If it already has a protocol, return as is
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      return trimmed;
+    }
+    
+    // If it starts with //, add https:
+    if (trimmed.startsWith("//")) {
+      return "https:" + trimmed;
+    }
+    
+    // If it's a local path starting with /, return as is
+    if (trimmed.startsWith("/")) {
+      return trimmed;
+    }
+    
+    // For everything else (domain names, subdomains, etc.), add https://
+    return "https://" + trimmed;
+  }).refine((val) => {
+    // Validate the final URL format
+    return val.startsWith("http://") || val.startsWith("https://") || val.startsWith("/");
   }, "Please enter a valid URL, domain, or path"),
 });
 

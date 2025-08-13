@@ -10,6 +10,9 @@ This project is a Reddit-style social platform enabling users to create and join
 - Unlimited voting capacity needed - no 2-vote maximum
 - Clean, minimalist UI styling for Community Notes feature
 - Subtle outline button styling preferred over bold colors
+- Communities sidebar should have sorting options (Popular, Alphabetic, New)
+- Community text should be truncated with ellipsis to prevent component overflow
+- Community Notes links must direct to actual external sites, not back to posts
 - Communities sidebar should have text truncation with ellipsis (...)
 - Communities sidebar should include sorting: Popular / Alphabetic / New
 
@@ -22,7 +25,8 @@ The platform is built with a clear separation of concerns, using an Express.js b
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database interactions.
 - **Authentication**: Session-based authentication with IP tracking for a unique voting system that does not require user accounts.
 - **Voting System**: Implements a Reddit-style "hot" ranking algorithm combining votes and time, alongside a "new" sorting option. Votes are IP-based, allowing for unlimited voting from different IPs on the same post. Posts and comments start with a score of 1.
-- **Community Notes**: Allows users to suggest helpful resources on posts via a modal, with each note having its own title, URL, and a 200-word comment. Notes have an independent voting system with step-by-step voting transitions, where high-scoring resources rise to the top. Features clean UI styling that matches the site theme.
+- **Community Notes**: Allows users to suggest helpful resources on posts via a modal, with each note having its own title, URL, and a 200-word comment. Notes have an independent voting system with step-by-step voting transitions, where high-scoring resources rise to the top. Features clean UI styling that matches the site theme. URLs are automatically formatted with proper protocols and direct to external sites.
+- **Communities Sidebar**: Enhanced with sorting options (Popular, Alphabetic, New) and proper text truncation to prevent overflow. Popular sorting is based on post count per community.
 - **Advertising System**: A text-based ad system with Stripe integration allows users to purchase impressions. Ads are injected every 10 posts in the main feed, with impression tracking and automatic deactivation upon reaching paid impression limits. Sponsored ads are distinctly styled and labeled.
 - **UI/UX Decisions**:
     - Minimalist design theme with adaptable styling for light/dark modes.

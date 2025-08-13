@@ -100,10 +100,17 @@ export default function CommunityNotesModal({
                               href={note.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors hover:underline"
                               data-testid={`note-link-${note.id}`}
+                              onClick={(e) => {
+                                // Ensure the link opens properly even for relative URLs
+                                if (note.url.startsWith('/')) {
+                                  e.preventDefault();
+                                  window.open(window.location.origin + note.url, '_blank', 'noopener,noreferrer');
+                                }
+                              }}
                             >
-                              <span className="truncate max-w-[300px]">{note.url}</span>
+                              <span className="truncate max-w-[300px]" title={note.url}>{note.url}</span>
                               <ExternalLink className="w-3 h-3 flex-shrink-0" />
                             </a>
                           </div>

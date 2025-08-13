@@ -10,6 +10,8 @@ This project is a Reddit-style social platform enabling users to create and join
 - Unlimited voting capacity needed - no 2-vote maximum
 - Clean, minimalist UI styling for Community Notes feature
 - Subtle outline button styling preferred over bold colors
+- Communities sidebar should have text truncation with ellipsis (...)
+- Communities sidebar should include sorting: Popular / Alphabetic / New
 
 ## System Architecture
 The platform is built with a clear separation of concerns, using an Express.js backend with TypeScript and a React frontend with Vite. Data persistence is handled by PostgreSQL with Drizzle ORM.

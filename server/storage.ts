@@ -41,7 +41,7 @@ function calculateHotScore(votes: number, createdAt: Date): number {
 
 export interface IStorage {
   // Communities
-  getCommunities(): Promise<Community[]>;
+  getCommunities(sort?: 'alphabetic' | 'new' | 'popular'): Promise<Community[]>;
   getCommunityByName(name: string): Promise<Community | undefined>;
   createCommunity(community: InsertCommunity): Promise<Community>;
   
@@ -84,8 +84,29 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getCommunities(): Promise<Community[]> {
-    return await db.select().from(communities).orderBy(communities.name);
+  async getCommunities(sort: 'alphabetic' | 'new' | 'popular' = 'alphabetic'): Promise<Community[]> {
+    if (sort === 'new') {
+      return await db.select().from(communities).orderBy(desc(communities.createdAt));
+    } else if (sort === 'popular') {
+      // Sort by popularity (communities with most posts)
+      const result = await db
+        .select({
+          id: communities.id,
+          name: communities.name,
+          description: communities.description,
+          createdAt: communities.createdAt,
+          postCount: sql<number>`count(${posts.id})`.as('post_count')
+        })
+        .from(communities)
+        .leftJoin(posts, eq(communities.id, posts.communityId))
+        .groupBy(communities.id)
+        .orderBy(desc(sql`count(${posts.id})`), communities.name);
+      
+      return result.map(({ postCount, ...community }) => community);
+    } else {
+      // alphabetic (default)
+      return await db.select().from(communities).orderBy(communities.name);
+    }
   }
 
   async getCommunityByName(name: string): Promise<Community | undefined> {

@@ -53,7 +53,7 @@ export interface IStorage {
   updatePostCommentCount(id: number, count: number): Promise<void>;
   
   // Comments
-  getCommentsByPost(postId: number): Promise<CommentWithChildren[]>;
+  getCommentsByPost(postId: number, sort?: 'hot' | 'new'): Promise<CommentWithChildren[]>;
   getComment(id: number): Promise<Comment | undefined>;
   createComment(comment: InsertComment): Promise<Comment>;
   updateCommentVotes(id: number, votes: number): Promise<void>;
@@ -202,14 +202,13 @@ export class DatabaseStorage implements IStorage {
     return comment || undefined;
   }
 
-  async getCommentsByPost(postId: number): Promise<CommentWithChildren[]> {
+  async getCommentsByPost(postId: number, sort: 'hot' | 'new' = 'hot'): Promise<CommentWithChildren[]> {
     const allComments = await db
       .select()
       .from(comments)
-      .where(eq(comments.postId, postId))
-      .orderBy(comments.createdAt);
+      .where(eq(comments.postId, postId));
 
-    // Build nested structure
+    // Build nested structure first
     const commentMap = new Map<number, CommentWithChildren>();
     const rootComments: CommentWithChildren[] = [];
 
@@ -231,7 +230,36 @@ export class DatabaseStorage implements IStorage {
       }
     });
 
-    return rootComments;
+    // Third pass: sort comments recursively
+    const sortComments = (comments: CommentWithChildren[]): CommentWithChildren[] => {
+      if (sort === 'new') {
+        // Sort by creation date (newest first)
+        comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      } else {
+        // Sort by hot score (like posts)
+        const commentsWithScores = comments.map(comment => {
+          const hotScore = calculateHotScore(comment.votes, new Date(comment.createdAt));
+          return { ...comment, hotScore };
+        });
+        
+        commentsWithScores.sort((a, b) => b.hotScore - a.hotScore);
+        
+        // Remove hotScore and update original array
+        comments.length = 0;
+        comments.push(...commentsWithScores.map(({ hotScore, ...comment }) => comment));
+      }
+
+      // Recursively sort children
+      comments.forEach(comment => {
+        if (comment.children.length > 0) {
+          comment.children = sortComments(comment.children);
+        }
+      });
+
+      return comments;
+    };
+
+    return sortComments(rootComments);
   }
 
   async createComment(insertComment: InsertComment): Promise<Comment> {

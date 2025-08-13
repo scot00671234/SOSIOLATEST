@@ -9,6 +9,7 @@ import Sidebar from "@/components/sidebar";
 import VoteButton from "@/components/vote-button";
 import Comment from "@/components/comment";
 import CommunityNotesModal from "@/components/community-notes-modal";
+import SortMenu from "@/components/sort-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ export default function PostPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showCommunityNotes, setShowCommunityNotes] = useState(false);
+  const [commentSort, setCommentSort] = useState<'hot' | 'new'>('hot');
 
   // Scroll to top when navigating to post page
   useEffect(() => {
@@ -59,9 +61,13 @@ export default function PostPage() {
   });
 
   const { data: comments, isLoading: commentsLoading } = useQuery<CommentWithChildren[]>({
-    queryKey: ["/api/posts", postId, "comments"],
-    queryFn: () => fetch(`/api/posts/${postId}/comments`).then(res => res.json()),
+    queryKey: ["/api/posts", postId, "comments", commentSort],
+    queryFn: () => fetch(`/api/posts/${postId}/comments?sort=${commentSort}`).then(res => res.json()),
   });
+
+  const handleCommentSortChange = (sort: 'hot' | 'new') => {
+    setCommentSort(sort);
+  };
 
   const form = useForm<CommentData>({
     resolver: zodResolver(commentSchema),
@@ -84,7 +90,7 @@ export default function PostPage() {
         description: "Comment posted successfully!",
       });
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/posts", postId, "comments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/posts", postId, "comments", commentSort] });
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
     },
     onError: (error: any) => {
@@ -232,7 +238,13 @@ export default function PostPage() {
               {/* Comments Section */}
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-4">Comments</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-lg">Comments</h3>
+                    <SortMenu 
+                      currentSort={commentSort}
+                      onSortChange={handleCommentSortChange}
+                    />
+                  </div>
                   
                   {commentsLoading ? (
                     <div className="space-y-4">

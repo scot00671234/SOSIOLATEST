@@ -164,8 +164,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/posts/:id/comments", async (req, res) => {
     try {
       const postId = parseInt(req.params.id);
+      const sort = (req.query.sort as 'hot' | 'new') || 'hot';
       const ipAddress = getClientIP(req);
-      const comments = await storage.getCommentsByPost(postId);
+      const comments = await storage.getCommentsByPost(postId, sort);
       
       // Add user vote information to comments recursively
       const addVotesToComments = async (commentList: any[]): Promise<any[]> => {

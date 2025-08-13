@@ -21,7 +21,7 @@ export default function Sidebar() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-lg">Communities</h3>
-              <div className="w-20 h-8 bg-muted rounded animate-pulse" />
+              <div className="w-16 h-7 bg-muted rounded animate-pulse" />
             </div>
             <div className="space-y-2">
               {[1, 2, 3, 4].map((i) => (
@@ -41,7 +41,7 @@ export default function Sidebar() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-lg">Communities</h3>
             <Select value={sortBy} onValueChange={(value: 'alphabetic' | 'popular' | 'new') => setSortBy(value)}>
-              <SelectTrigger className="w-[90px] h-8 text-xs">
+              <SelectTrigger className="w-[70px] h-7 text-xs border-0 shadow-none p-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

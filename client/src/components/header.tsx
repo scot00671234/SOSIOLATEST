@@ -438,14 +438,16 @@ export default function Header() {
               and act on what helps make the platform better.
             </p>
             <div className="pt-2 border-t">
-              <Link 
-                href="/c/Sosiol%20Feedback"
+              <a 
+                href="https://www.sosiol.com/c/Sosiol%20Feedback"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setShowFeedback(false)}
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium text-sm"
               >
                 <Users className="h-4 w-4" />
                 Visit Sosiol Feedback Community
-              </Link>
+              </a>
             </div>
           </DialogDescription>
         </DialogContent>

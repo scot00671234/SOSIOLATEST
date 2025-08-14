@@ -16,6 +16,7 @@ This project is a Reddit-style social platform enabling users to create and join
 - Comments should be sorted by Hot/New algorithm like posts, not just chronologically
 - Communities sidebar should have text truncation with ellipsis (...)
 - Communities sidebar should include sorting: Popular / Alphabetic / New
+- Blog section added to navigation menu with SEO-focused content targeting free speech and Reddit alternative keywords
 
 ## System Architecture
 The platform is built with a clear separation of concerns, using an Express.js backend with TypeScript and a React frontend with Vite. Data persistence is handled by PostgreSQL with Drizzle ORM.
@@ -44,6 +45,7 @@ The platform is built with a clear separation of concerns, using an Express.js b
 - **Comments**: Nested comments with individual voting capabilities.
 - **Search**: Comprehensive search functionality across posts, communities, and comments.
 - **About/Policy Sections**: Modals for About, Privacy Policy, Stay Safe, and Feedback information.
+- **Blog**: SEO-optimized blog section with articles targeting keywords for Reddit alternatives, free speech social media, and community platforms without censorship.
 
 ## External Dependencies
 - **Database**: PostgreSQL (with Drizzle ORM)

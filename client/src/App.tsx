@@ -9,6 +9,7 @@ import CommunityPage from "@/pages/community";
 import PostPage from "@/pages/post";
 import SearchPage from "@/pages/search";
 import AdvertisePage from "@/pages/advertise";
+import BlogPage from "@/pages/blog";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/post/:id/:title?" component={PostPage} />
       <Route path="/search" component={SearchPage} />
       <Route path="/advertise" component={AdvertisePage} />
+      <Route path="/blog" component={BlogPage} />
       <Route component={NotFound} />
     </Switch>
   );

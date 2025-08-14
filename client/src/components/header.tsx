@@ -431,25 +431,25 @@ export default function Header() {
               Feedback
             </DialogTitle>
           </DialogHeader>
-          <DialogDescription className="text-base leading-relaxed space-y-4">
-            <p>
+          <DialogDescription className="text-base leading-relaxed">
+            <p className="mb-4">
               We're always improving Sosiol, and your input matters. Join the Sosiol Feedback 
               community to share your ideas, report bugs, and suggest features. We read everything 
               and act on what helps make the platform better.
             </p>
-            <div className="pt-2 border-t">
-              <a 
-                href="https://www.sosiol.com/c/Sosiol%20Feedback"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setShowFeedback(false)}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium text-sm"
-              >
-                <Users className="h-4 w-4" />
-                Visit Sosiol Feedback Community
-              </a>
-            </div>
           </DialogDescription>
+          <div className="pt-2 border-t mt-4">
+            <a 
+              href="https://www.sosiol.com/c/Sosiol%20Feedback%20"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setShowFeedback(false)}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium text-sm"
+            >
+              <Users className="h-4 w-4" />
+              Visit Sosiol Feedback Community
+            </a>
+          </div>
         </DialogContent>
       </Dialog>
     </>

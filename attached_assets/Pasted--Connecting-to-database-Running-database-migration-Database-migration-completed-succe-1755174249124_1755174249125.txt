@@ -1,0 +1,79 @@
+🔄 Connecting to database...
+🔄 Running database migration...
+✅ Database migration completed successfully!
+📊 All tables created:
+• communities
+• posts
+• comments
+• votes
+• sponsored_ads
+• community_notes
+npm warn config production Use `--omit=dev` instead.
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+12:23:17 PM [express] serving on port 3000
+Failed to get active ad: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getActiveAd (file:///app/dist/index.js:391:18)
+at async file:///app/dist/index.js:692:18
+12:23:17 PM [express] GET /api/active-ad 500 in 44ms :: {"message":"Failed to get ad"}
+Failed to fetch communities: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getCommunities (file:///app/dist/index.js:228:14)
+at async file:///app/dist/index.js:474:28
+12:23:17 PM [express] GET /api/communities 500 in 33ms :: {"message":"Failed to fetch communities"}
+Failed to fetch communities: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getCommunities (file:///app/dist/index.js:219:22)
+at async file:///app/dist/index.js:474:28
+12:23:17 PM [express] GET /api/communities 500 in 32ms :: {"message":"Failed to fetch communities"}
+Failed to fetch communities: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getCommunities (file:///app/dist/index.js:228:14)
+at async file:///app/dist/index.js:474:28
+12:23:23 PM [express] GET /api/communities 500 in 12ms :: {"message":"Failed to fetch communities"}
+Failed to fetch communities: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getCommunities (file:///app/dist/index.js:219:22)
+at async file:///app/dist/index.js:474:28
+12:23:23 PM [express] GET /api/communities 500 in 11ms :: {"message":"Failed to fetch communities"}
+12:23:23 PM [express] GET /api/active-ad 500 in 12ms :: {"message":"Failed to get ad"}
+Failed to get active ad: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getActiveAd (file:///app/dist/index.js:391:18)
+at async file:///app/dist/index.js:692:18
+12:23:23 PM [express] GET /api/posts 500 in 14ms :: {"message":"Failed to fetch posts"}
+12:23:26 PM [express] GET /api/communities 500 in 10ms :: {"message":"Failed to fetch communities"}
+Failed to fetch communities: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getCommunities (file:///app/dist/index.js:219:22)
+at async file:///app/dist/index.js:474:28
+Failed to fetch communities: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getCommunities (file:///app/dist/index.js:228:14)
+at async file:///app/dist/index.js:474:28
+12:23:26 PM [express] GET /api/communities 500 in 12ms :: {"message":"Failed to fetch communities"}
+Failed to get active ad: Error: The server does not support SSL connections
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getActiveAd (file:///app/dist/index.js:391:18)
+at async file:///app/dist/index.js:692:18
+12:23:26 PM [express] GET /api/active-ad 500 in 14ms :: {"message":"Failed to get ad"}
+12:23:26 PM [express] GET /api/posts 500 in 23ms :: {"message":"Failed to fetch posts"}

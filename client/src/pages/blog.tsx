@@ -33,7 +33,7 @@ The nested comment system that made Reddit popular remains intact on Sosiol, but
 
 For users tired of walking on eggshells or having their content unexpectedly removed, Sosiol offers a refreshing alternative where meaningful discussions can flourish without fear of arbitrary censorship.`,
     readTime: "4 min read",
-    publishDate: "2024-01-15",
+    publishDate: "2025-08-14",
     category: "Platform",
     slug: "free-speech-alternative-reddit"
   },
@@ -54,7 +54,7 @@ The result is communities that feel more authentic and democratic. Users report 
 
 For community leaders looking to build engaged, active groups around shared interests, Sosiol provides the tools needed without the constant worry about platform policies changing overnight.`,
     readTime: "5 min read",
-    publishDate: "2024-01-08",
+    publishDate: "2025-08-14",
     category: "Community",
     slug: "building-communities-without-censorship"
   },
@@ -75,7 +75,7 @@ The democratic nature of threaded discussions aligns perfectly with free speech 
 
 For users accustomed to platforms where comments can be hidden or removed, Sosiol's approach preserves the full context of discussions, allowing readers to form their own opinions based on complete information rather than curated selections.`,
     readTime: "3 min read", 
-    publishDate: "2024-01-01",
+    publishDate: "2025-08-14",
     category: "Features",
     slug: "power-of-nested-comments"
   },
@@ -96,7 +96,7 @@ The absence of algorithmic manipulation also means users can trust that their co
 
 For users frustrated with platforms that seem to hide content they want to see while promoting content that feels forced, Sosiol's transparent approach offers a refreshing alternative where user agency comes first.`,
     readTime: "4 min read",
-    publishDate: "2023-12-28",
+    publishDate: "2025-08-14",
     category: "Technology", 
     slug: "social-media-without-algorithmic-manipulation"
   },
@@ -119,7 +119,7 @@ The voting system serves as a democratic tool for community curation, allowing m
 
 For anyone looking to build or join authentic online communities, understanding these principles can help identify platforms and spaces that prioritize genuine human connection over commercial metrics.`,
     readTime: "5 min read",
-    publishDate: "2023-12-20",
+    publishDate: "2025-08-14",
     category: "Community",
     slug: "creating-authentic-online-communities-2024"
   }

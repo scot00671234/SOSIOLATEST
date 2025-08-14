@@ -177,12 +177,6 @@ export default function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
-                    <Link href="/blog" className="flex items-center w-full" data-testid="blog-menu-item">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      <span>Blog</span>
-                    </Link>
-                  </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => setShowAbout(true)}
                     data-testid="about-menu-item"
@@ -210,6 +204,12 @@ export default function Header() {
                   >
                     <MessageSquare className="mr-2 h-4 w-4" />
                     <span>Feedback</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/blog" className="flex items-center w-full" data-testid="blog-menu-item">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      <span>Blog</span>
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -243,12 +243,6 @@ export default function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
-                    <Link href="/blog" className="flex items-center w-full" data-testid="mobile-blog-menu-item">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      <span>Blog</span>
-                    </Link>
-                  </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => setShowAbout(true)}
                     data-testid="mobile-about-menu-item"
@@ -276,6 +270,12 @@ export default function Header() {
                   >
                     <MessageSquare className="mr-2 h-4 w-4" />
                     <span>Feedback</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/blog" className="flex items-center w-full" data-testid="mobile-blog-menu-item">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      <span>Blog</span>
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

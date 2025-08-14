@@ -233,7 +233,7 @@ export default function BlogPage() {
                       <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow">
                         {post.excerpt}
                       </p>
-                      <Button variant="ghost" size="sm" className="self-start p-0 h-auto font-medium text-primary hover:text-primary/80">
+                      <Button variant="ghost" size="sm" className="self-start p-0 h-auto font-medium text-muted-foreground hover:text-foreground">
                         Read more <ArrowRight className="h-3 w-3 ml-1" />
                       </Button>
                     </CardContent>

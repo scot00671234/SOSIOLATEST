@@ -17,8 +17,7 @@ const connectionString = process.env.DATABASE_URL;
 export const pool = new Pool({ 
   connectionString,
   ssl: connectionString.includes('localhost') || 
-       connectionString.includes('127.0.0.1') ||
-       process.env.NODE_ENV === 'production'
+       connectionString.includes('127.0.0.1')
     ? false 
     : { rejectUnauthorized: false },
   max: 20,

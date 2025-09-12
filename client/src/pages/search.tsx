@@ -130,7 +130,7 @@ export default function SearchPage() {
                             Posts
                           </h3>
                           <div className="space-y-4">
-                            {searchResults.posts.map((post) => (
+                            {searchResults.posts?.map((post) => (
                               <PostCard key={post.id} post={post} />
                             ))}
                           </div>

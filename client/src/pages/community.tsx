@@ -32,10 +32,19 @@ export default function CommunityPage() {
 
   const actualCommunityId = community?.id || 0;
 
-  const { data: posts, isLoading: postsLoading } = useQuery<PostWithCommunity[]>({
+  const { data: posts, isLoading: postsLoading, error: postsError } = useQuery<PostWithCommunity[]>({
     queryKey: ["/api/posts", { communityId: actualCommunityId, sort }],
-    queryFn: () => fetch(`/api/posts?communityId=${actualCommunityId}&sort=${sort}`).then(res => res.json()),
+    queryFn: async () => {
+      const res = await fetch(`/api/posts?communityId=${actualCommunityId}&sort=${sort}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch posts');
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    },
     enabled: !!actualCommunityId,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   return (
@@ -69,7 +78,19 @@ export default function CommunityPage() {
                   </div>
                 </div>
                 
-                {postsLoading ? (
+                {postsError ? (
+                  <div className="text-center py-8">
+                    <p className="text-destructive text-base mb-2">
+                      Failed to load posts. Please try again.
+                    </p>
+                    <button 
+                      onClick={() => window.location.reload()} 
+                      className="text-primary hover:underline text-sm"
+                    >
+                      Refresh page
+                    </button>
+                  </div>
+                ) : postsLoading ? (
                   <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
                       <div key={i} className="border rounded-lg p-4">

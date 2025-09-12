@@ -11,9 +11,18 @@ import type { PostWithCommunity, SponsoredAd } from "@shared/schema";
 export default function Home() {
   const [sort, setSort] = useState<'hot' | 'new'>('hot');
   
-  const { data: posts, isLoading } = useQuery<PostWithCommunity[]>({
+  const { data: posts, isLoading, error } = useQuery<PostWithCommunity[]>({
     queryKey: ["/api/posts", { sort }],
-    queryFn: () => fetch(`/api/posts?sort=${sort}`).then(res => res.json()),
+    queryFn: async () => {
+      const res = await fetch(`/api/posts?sort=${sort}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch posts');
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    },
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const { data: currentAd } = useQuery<SponsoredAd | null>({
@@ -23,7 +32,8 @@ export default function Home() {
 
   // Function to inject ads every 10 posts
   const createFeedWithAds = (posts: PostWithCommunity[], ad: SponsoredAd | null) => {
-    if (!ad || !posts.length) return posts.map((post, index) => ({ type: 'post', content: post, key: `post-${index}` }));
+    if (!posts || !posts.length) return [];
+    if (!ad) return posts.map((post, index) => ({ type: 'post', content: post, key: `post-${index}` }));
     
     const feedItems: Array<{ type: 'post' | 'ad', content: PostWithCommunity | SponsoredAd, key: string }> = [];
     
@@ -66,7 +76,19 @@ export default function Home() {
                   />
                 </div>
                 
-                {isLoading ? (
+                {error ? (
+                  <div className="text-center py-6 sm:py-8">
+                    <p className="text-destructive text-sm sm:text-base mb-2">
+                      Failed to load posts. Please try again.
+                    </p>
+                    <button 
+                      onClick={() => window.location.reload()} 
+                      className="text-primary hover:underline text-sm"
+                    >
+                      Refresh page
+                    </button>
+                  </div>
+                ) : isLoading ? (
                   <div className="space-y-3 sm:space-y-4">
                     {[1, 2, 3].map((i) => (
                       <div key={i} className="border rounded-lg p-3 sm:p-4">

@@ -280,7 +280,13 @@ export class DatabaseStorage implements IStorage {
       try {
         const [post] = await db
           .insert(posts)
-          .values(insertPost)
+          .values({
+            title: insertPost.title,
+            content: insertPost.content,
+            communityId: insertPost.communityId,
+            votes: 1, // Default starting votes
+            commentCount: 0 // Default starting comment count
+          })
           .returning({
             id: posts.id,
             title: posts.title,

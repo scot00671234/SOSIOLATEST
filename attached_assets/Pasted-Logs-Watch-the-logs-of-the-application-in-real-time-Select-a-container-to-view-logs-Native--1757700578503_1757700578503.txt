@@ -1,0 +1,47 @@
+Logs
+Watch the logs of the application in real time
+
+Select a container to view logs
+Native
+
+
+sosiol-app-omgmps.1.gw8u2ptskyqq9m4uxrhr5egx3 (ac895e21f418) 
+Search logs...
+🔄 Connecting to database...
+🔄 Running database migration...
+✅ Database migration completed successfully!
+📊 All tables created:
+• communities
+• posts
+• comments
+• votes
+• sponsored_ads
+• community_notes
+npm warn config production Use `--omit=dev` instead.
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+STRIPE_SECRET_KEY environment variable not set. Stripe payments will be disabled.
+6:06:51 PM [express] serving on port 3000
+6:08:14 PM [express] GET /api/active-ad 304 in 23ms
+Slug column may not exist, returning base slug: column posts.slug does not exist
+⚠️  Slug column missing or error creating post with slug, trying without slug... column "slug" of relation "posts" does not exist
+Failed to create post even without slug: column "slug" of relation "posts" does not exist
+6:08:40 PM [express] POST /api/posts 500 in 33ms :: {"message":"Failed to create post"}
+6:08:44 PM [express] GET /api/active-ad 304 in 11ms
+6:08:50 PM [express] GET /api/active-ad 304 in 2ms
+Slug column may not exist, returning base slug: column posts.slug does not exist
+⚠️  Slug column missing or error creating post with slug, trying without slug... column "slug" of relation "posts" does not exist
+Failed to create post even without slug: column "slug" of relation "posts" does not exist
+6:08:53 PM [express] POST /api/posts 500 in 29ms :: {"message":"Failed to create post"}
+Slug column may not exist, returning base slug: column posts.slug does not exist
+⚠️  Slug column missing or error creating post with slug, trying without slug... column "slug" of relation "posts" does not exist
+Failed to create post even without slug: column "slug" of relation "posts" does not exist
+6:08:55 PM [express] POST /api/posts 500 in 38ms :: {"message":"Failed to create post"}
+6:09:02 PM [express] POST /api/communities 201 in 12ms :: {"id":6,"name":"test","description":null,"…
+6:09:03 PM [express] GET /api/communities 200 in 7ms :: [{"id":5,"name":"Philosophy","description":n…
+6:09:03 PM [express] GET /api/communities 200 in 3ms :: [{"id":1,"name":"Sosiol","description":null,…
+Slug column may not exist, returning base slug: column posts.slug does not exist
+⚠️  Slug column missing or error creating post with slug, trying without slug... column "slug" of relation "posts" does not exist
+Failed to create post even without slug: column "slug" of relation "posts" does not exist
+6:09:18 PM [express] POST /api/posts 500 in 22ms :: {"message":"Failed to create post"}
+6:09:20 PM [express] GET /api/active-ad 304 in 10ms

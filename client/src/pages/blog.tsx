@@ -572,48 +572,47 @@ export default function BlogPage() {
         <Header />
         
         <main className="max-w-6xl mx-auto px-4 py-8">
-          {!selectedPost ? (
-            <div>
-              <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-foreground mb-4">
-                  Sosiol Blog
-                </h1>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Insights on free speech platforms, community building, and creating authentic online discussions
-                </p>
-              </div>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-foreground mb-4" data-testid="text-blog-title">
+              Sosiol Blog
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-blog-description">
+              Insights on free speech platforms, community building, and creating authentic online discussions
+            </p>
+          </div>
 
-              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {blogPosts.map((post) => (
-                  <Card key={post.id} className="hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col" onClick={() => setSelectedPost(post)}>
-                    <CardHeader className="flex-shrink-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {post.category}
-                        </Badge>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {post.readTime}
-                        </div>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {blogPosts.map((post) => (
+              <Link key={post.id} href={`/blog/${post.slug}`} data-testid={`link-blog-post-${post.id}`}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col" data-testid={`card-blog-post-${post.id}`}>
+                  <CardHeader className="flex-shrink-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="secondary" className="text-xs" data-testid={`badge-category-${post.id}`}>
+                        {post.category}
+                      </Badge>
+                      <div className="flex items-center text-xs text-muted-foreground" data-testid={`text-read-time-${post.id}`}>
+                        <Clock className="h-3 w-3 mr-1" />
+                        {post.readTime}
                       </div>
-                      <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {formatDate(post.publishDate)}
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex-grow flex flex-col">
-                      <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow">
-                        {post.excerpt}
-                      </p>
-                      <Button variant="ghost" size="sm" className="self-start p-0 h-auto font-medium text-muted-foreground hover:text-foreground">
-                        Read more <ArrowRight className="h-3 w-3 ml-1" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
+                    </div>
+                    <CardTitle className="text-lg line-clamp-2" data-testid={`text-post-title-${post.id}`}>{post.title}</CardTitle>
+                    <div className="flex items-center text-xs text-muted-foreground" data-testid={`text-publish-date-${post.id}`}>
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {formatDate(post.publishDate)}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-grow flex flex-col">
+                    <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow" data-testid={`text-post-excerpt-${post.id}`}>
+                      {post.excerpt}
+                    </p>
+                    <Button variant="ghost" size="sm" className="self-start p-0 h-auto font-medium text-muted-foreground hover:text-foreground" data-testid={`button-read-more-${post.id}`}>
+                      Read more <ArrowRight className="h-3 w-3 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
         </main>
       </div>
     </>

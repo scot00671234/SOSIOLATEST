@@ -146,6 +146,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get post by slug
+  app.get("/api/posts/by-slug/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const ipAddress = getClientIP(req);
+      const post = await storage.getPostBySlug(slug);
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      
+      // Add user vote information
+      const userVote = await storage.getVote(ipAddress, 'post', post.id);
+      const postWithVote = {
+        ...post,
+        userVote: userVote?.voteType || null
+      };
+      
+      res.json(postWithVote);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch post" });
+    }
+  });
+
   // Create a new post
   app.post("/api/posts", async (req, res) => {
     try {

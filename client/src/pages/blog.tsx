@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { Helmet } from "react-helmet";
 import Header from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
+import { Link } from "wouter";
 
 interface BlogPost {
   id: string;
@@ -548,7 +548,6 @@ Ready to participate in communities where open dialogue can flourish without cor
 ];
 
 export default function BlogPage() {
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', { 
@@ -615,51 +614,6 @@ export default function BlogPage() {
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="max-w-4xl mx-auto">
-              <Button 
-                variant="ghost" 
-                onClick={() => setSelectedPost(null)}
-                className="mb-6 text-muted-foreground hover:text-foreground"
-              >
-                ← Back to Blog
-              </Button>
-              
-              <article>
-                <header className="mb-8">
-                  <div className="flex items-center gap-4 mb-4">
-                    <Badge variant="secondary">
-                      {selectedPost.category}
-                    </Badge>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {formatDate(selectedPost.publishDate)}
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 mr-1" />
-                      {selectedPost.readTime}
-                    </div>
-                  </div>
-                  <h1 className="text-4xl font-bold text-foreground mb-4">
-                    {selectedPost.title}
-                  </h1>
-                  <p className="text-xl text-muted-foreground">
-                    {selectedPost.excerpt}
-                  </p>
-                </header>
-                
-                <div className="prose prose-lg max-w-none dark:prose-invert">
-                  {selectedPost.content.split('\n\n').map((paragraph, index) => (
-                    paragraph.trim() && (
-                      <p key={index} className="mb-6 text-foreground leading-relaxed">
-                        {paragraph.trim()}
-                      </p>
-                    )
-                  ))}
-                </div>
-              </article>
-            </div>
-          )}
         </main>
       </div>
     </>

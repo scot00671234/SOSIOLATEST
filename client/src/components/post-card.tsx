@@ -27,8 +27,9 @@ export default function PostCard({ post }: PostCardProps) {
   const { toast } = useToast();
 
   const handleShare = async (type: string) => {
-    const titleSlug = createPostSlug(post.title);
-    const url = `${window.location.origin}/post/${post.id}/${titleSlug}`;
+    const url = post.slug 
+      ? `${window.location.origin}/post/${post.slug}`
+      : `${window.location.origin}/post/${post.id}/${createPostSlug(post.title)}`;
     const title = post.title;
     const text = `Check out this post: ${title}`;
 
@@ -63,7 +64,7 @@ export default function PostCard({ post }: PostCardProps) {
     }
   };
 
-  const postUrl = `/post/${post.id}/${createPostSlug(post.title)}`;
+  const postUrl = post.slug ? `/post/${post.slug}` : `/post/${post.id}/${createPostSlug(post.title)}`;
 
   return (
     <Link href={postUrl} className="block">

@@ -19,6 +19,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/community/:id" component={CommunityPage} />
       <Route path="/c/:name" component={CommunityPage} />
+      <Route path="/post/:slug" component={PostPage} />
       <Route path="/post/:id/:title?" component={PostPage} />
       <Route path="/search" component={SearchPage} />
       <Route path="/advertise" component={AdvertisePage} />

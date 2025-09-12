@@ -43,26 +43,34 @@ function formatTimeAgo(date: Date | string): string {
 }
 
 export default function PostPage() {
-  const { id } = useParams<{ id: string; title?: string }>();
-  const postId = parseInt(id || "0");
+  const params = useParams<{ id?: string; title?: string; slug?: string }>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showCommunityNotes, setShowCommunityNotes] = useState(false);
   const [commentSort, setCommentSort] = useState<'hot' | 'new'>('hot');
 
+  // Determine if this is a slug-based or ID-based URL
+  const isSlugBased = !!params.slug;
+  const postId = params.id ? parseInt(params.id || "0") : 0;
+  const postSlug = params.slug;
+
   // Scroll to top when navigating to post page
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [params.id, params.slug]);
 
   const { data: post, isLoading: postLoading } = useQuery<PostWithCommunity>({
-    queryKey: ["/api/posts", postId],
-    queryFn: () => fetch(`/api/posts/${postId}`).then(res => res.json()),
+    queryKey: isSlugBased ? ["/api/posts/by-slug", postSlug] : ["/api/posts", postId],
+    queryFn: isSlugBased 
+      ? () => fetch(`/api/posts/by-slug/${postSlug}`).then(res => res.json())
+      : () => fetch(`/api/posts/${postId}`).then(res => res.json()),
+    enabled: isSlugBased ? !!postSlug : postId > 0,
   });
 
   const { data: comments, isLoading: commentsLoading } = useQuery<CommentWithChildren[]>({
-    queryKey: ["/api/posts", postId, "comments", commentSort],
-    queryFn: () => fetch(`/api/posts/${postId}/comments?sort=${commentSort}`).then(res => res.json()),
+    queryKey: ["/api/posts", post?.id, "comments", commentSort],
+    queryFn: () => fetch(`/api/posts/${post?.id}/comments?sort=${commentSort}`).then(res => res.json()),
+    enabled: !!post?.id,
   });
 
   const handleCommentSortChange = (sort: 'hot' | 'new') => {
@@ -80,7 +88,7 @@ export default function PostPage() {
     mutationFn: async (data: CommentData) => {
       return apiRequest("POST", "/api/comments", {
         content: data.content,
-        postId,
+        postId: post!.id,
         parentId: null,
       });
     },
@@ -90,7 +98,7 @@ export default function PostPage() {
         description: "Comment posted successfully!",
       });
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/posts", postId, "comments", commentSort] });
+      queryClient.invalidateQueries({ queryKey: ["/api/posts", post!.id, "comments", commentSort] });
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
     },
     onError: (error: any) => {

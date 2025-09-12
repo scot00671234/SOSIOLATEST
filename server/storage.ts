@@ -208,7 +208,7 @@ export class DatabaseStorage implements IStorage {
 
   async createPost(insertPost: InsertPost): Promise<Post> {
     try {
-      // Generate unique slug from title
+      // Try to generate unique slug from title
       const slug = await generateUniqueSlug(insertPost.title);
       
       const [post] = await db
@@ -220,18 +220,18 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return post;
     } catch (error: any) {
-      // Handle case where slug column doesn't exist in production
-      if (error.message?.includes('column "slug" does not exist') || error.message?.includes('slug')) {
-        console.log('⚠️  Slug column missing, creating post without slug...');
-        // For production databases without slug column, we need to cast the insertion
-        const postData = insertPost as any;
+      console.log('⚠️  Slug column missing or error creating post with slug, trying without slug...', error.message);
+      // Fallback: create post without slug for production databases that don't have the column
+      try {
         const [post] = await db
           .insert(posts)
-          .values(postData)
+          .values(insertPost)
           .returning();
         return post;
+      } catch (fallbackError: any) {
+        console.error('Failed to create post even without slug:', fallbackError.message);
+        throw fallbackError;
       }
-      throw error;
     }
   }
 

@@ -13,7 +13,7 @@ export const communities = pgTable("communities", {
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
-  slug: text("slug").notNull().unique(),
+  slug: text("slug").unique(), // Made optional for backward compatibility
   content: text("content").notNull(),
   communityId: integer("community_id").notNull().references(() => communities.id),
   votes: integer("votes").default(1).notNull(),

@@ -37,13 +37,19 @@ async function generateUniqueSlug(title: string): Promise<string> {
   let uniqueSlug = baseSlug;
   let counter = 1;
   
-  while (true) {
-    const existingPost = await db.select().from(posts).where(eq(posts.slug, uniqueSlug)).limit(1);
-    if (existingPost.length === 0) {
-      break;
+  try {
+    while (true) {
+      const existingPost = await db.select({ id: posts.id }).from(posts).where(eq(posts.slug, uniqueSlug)).limit(1);
+      if (existingPost.length === 0) {
+        break;
+      }
+      uniqueSlug = `${baseSlug}-${counter}`;
+      counter++;
     }
-    uniqueSlug = `${baseSlug}-${counter}`;
-    counter++;
+  } catch (error: any) {
+    // If slug column doesn't exist, just return the base slug
+    console.warn('Slug column may not exist, returning base slug:', error.message);
+    return baseSlug;
   }
   
   return uniqueSlug;
@@ -150,8 +156,25 @@ export class DatabaseStorage implements IStorage {
 
   async getPosts(communityId?: number, sort: 'hot' | 'new' = 'hot'): Promise<PostWithCommunity[]> {
     try {
+      // Select specific fields to avoid missing slug column errors in production
       const query = db
-        .select()
+        .select({
+          post: {
+            id: posts.id,
+            title: posts.title,
+            content: posts.content,
+            communityId: posts.communityId,
+            votes: posts.votes,
+            commentCount: posts.commentCount,
+            createdAt: posts.createdAt
+          },
+          community: {
+            id: communities.id,
+            name: communities.name,
+            description: communities.description,
+            createdAt: communities.createdAt
+          }
+        })
         .from(posts)
         .leftJoin(communities, eq(posts.communityId, communities.id));
       
@@ -163,8 +186,8 @@ export class DatabaseStorage implements IStorage {
       }
       
       const postsWithCommunity = result.map(row => ({
-        ...row.posts,
-        community: row.communities!
+        ...row.post,
+        community: row.community!
       }));
       
       if (sort === 'new') {
@@ -192,18 +215,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPost(id: number): Promise<PostWithCommunity | undefined> {
-    const [result] = await db
-      .select()
-      .from(posts)
-      .leftJoin(communities, eq(posts.communityId, communities.id))
-      .where(eq(posts.id, id));
-    
-    if (!result) return undefined;
-    
-    return {
-      ...result.posts,
-      community: result.communities!
-    };
+    try {
+      const [result] = await db
+        .select({
+          post: {
+            id: posts.id,
+            title: posts.title,
+            content: posts.content,
+            communityId: posts.communityId,
+            votes: posts.votes,
+            commentCount: posts.commentCount,
+            createdAt: posts.createdAt
+          },
+          community: {
+            id: communities.id,
+            name: communities.name,
+            description: communities.description,
+            createdAt: communities.createdAt
+          }
+        })
+        .from(posts)
+        .leftJoin(communities, eq(posts.communityId, communities.id))
+        .where(eq(posts.id, id));
+      
+      if (!result) return undefined;
+      
+      return {
+        ...result.post,
+        community: result.community!
+      };
+    } catch (error: any) {
+      console.error('Error fetching post:', error);
+      return undefined;
+    }
   }
 
   async createPost(insertPost: InsertPost): Promise<Post> {
@@ -236,18 +280,40 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPostBySlug(slug: string): Promise<PostWithCommunity | undefined> {
-    const [result] = await db
-      .select()
-      .from(posts)
-      .leftJoin(communities, eq(posts.communityId, communities.id))
-      .where(eq(posts.slug, slug));
-    
-    if (!result) return undefined;
-    
-    return {
-      ...result.posts,
-      community: result.communities!
-    };
+    try {
+      // Check if slug column exists by trying to query it
+      const [result] = await db
+        .select({
+          post: {
+            id: posts.id,
+            title: posts.title,
+            content: posts.content,
+            communityId: posts.communityId,
+            votes: posts.votes,
+            commentCount: posts.commentCount,
+            createdAt: posts.createdAt
+          },
+          community: {
+            id: communities.id,
+            name: communities.name,
+            description: communities.description,
+            createdAt: communities.createdAt
+          }
+        })
+        .from(posts)
+        .leftJoin(communities, eq(posts.communityId, communities.id))
+        .where(eq(posts.slug, slug));
+      
+      if (!result) return undefined;
+      
+      return {
+        ...result.post,
+        community: result.community!
+      };
+    } catch (error: any) {
+      console.error('Error fetching post by slug (slug column may not exist):', error);
+      return undefined;
+    }
   }
 
   async updatePostVotes(id: number, votes: number): Promise<void> {

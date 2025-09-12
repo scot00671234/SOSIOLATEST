@@ -272,8 +272,19 @@ export class DatabaseStorage implements IStorage {
         const [post] = await db
           .insert(posts)
           .values(insertPost)
-          .returning();
-        return post;
+          .returning({
+            id: posts.id,
+            title: posts.title,
+            content: posts.content,
+            communityId: posts.communityId,
+            votes: posts.votes,
+            commentCount: posts.commentCount,
+            createdAt: posts.createdAt
+          });
+        return {
+          ...post,
+          slug: null // Add slug field with null value for type compatibility
+        };
       } catch (fallbackError: any) {
         console.error('Failed to create post even without slug:', fallbackError.message);
         throw fallbackError;

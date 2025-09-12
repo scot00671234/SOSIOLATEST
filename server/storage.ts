@@ -23,6 +23,31 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
+// Slug generation functions
+function createPostSlug(title: string): string {
+  return title.toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .replace(/-+/g, '-')
+    .substring(0, 100); // Limit slug length
+}
+
+async function generateUniqueSlug(title: string): Promise<string> {
+  const baseSlug = createPostSlug(title);
+  let uniqueSlug = baseSlug;
+  let counter = 1;
+  
+  while (true) {
+    const existingPost = await db.select().from(posts).where(eq(posts.slug, uniqueSlug)).limit(1);
+    if (existingPost.length === 0) {
+      break;
+    }
+    uniqueSlug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+  
+  return uniqueSlug;
+}
 
 // Reddit-style hot algorithm
 function calculateHotScore(votes: number, createdAt: Date): number {
@@ -48,6 +73,7 @@ export interface IStorage {
   // Posts
   getPosts(communityId?: number, sort?: 'hot' | 'new'): Promise<PostWithCommunity[]>;
   getPost(id: number): Promise<PostWithCommunity | undefined>;
+  getPostBySlug(slug: string): Promise<PostWithCommunity | undefined>;
   createPost(post: InsertPost): Promise<Post>;
   updatePostVotes(id: number, votes: number): Promise<void>;
   updatePostCommentCount(id: number, count: number): Promise<void>;
@@ -176,11 +202,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPost(insertPost: InsertPost): Promise<Post> {
+    // Generate unique slug from title
+    const slug = await generateUniqueSlug(insertPost.title);
+    
     const [post] = await db
       .insert(posts)
-      .values(insertPost)
+      .values({
+        ...insertPost,
+        slug
+      })
       .returning();
     return post;
+  }
+
+  async getPostBySlug(slug: string): Promise<PostWithCommunity | undefined> {
+    const [result] = await db
+      .select()
+      .from(posts)
+      .leftJoin(communities, eq(posts.communityId, communities.id))
+      .where(eq(posts.slug, slug));
+    
+    if (!result) return undefined;
+    
+    return {
+      ...result.posts,
+      community: result.communities!
+    };
   }
 
   async updatePostVotes(id: number, votes: number): Promise<void> {

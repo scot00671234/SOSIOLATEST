@@ -13,6 +13,7 @@ export const communities = pgTable("communities", {
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
   content: text("content").notNull(),
   communityId: integer("community_id").notNull().references(() => communities.id),
   votes: integer("votes").default(1).notNull(),
@@ -106,6 +107,7 @@ export const insertCommunitySchema = createInsertSchema(communities).omit({
 
 export const insertPostSchema = createInsertSchema(posts).omit({
   id: true,
+  slug: true,
   votes: true,
   commentCount: true,
   createdAt: true,

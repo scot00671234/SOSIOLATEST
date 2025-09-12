@@ -1,0 +1,120 @@
+app
+sosiol-app-omgmps
+Dokploy Server
+General
+Environment
+Domains
+Preview Deployments
+Schedules
+Volume Backups
+Deployments
+Logs
+Monitoring
+Advanced
+Logs
+Watch the logs of the application in real time
+
+Select a container to view logs
+Native
+
+
+sosiol-app-omgmps.1.q2khxtiblebeppuuhfxyunpy1 (c64572dbd8e9) 
+Search logs...
+STRIPE_SECRET_KEY environment variable not set. Stripe payments will be disabled.
+5:13:59 PM [express] serving on port 3000
+5:15:14 PM [express] GET /api/active-ad 304 in 59ms
+5:15:14 PM [express] GET /api/communities 200 in 58ms :: [{"id":5,"name":"Philosophy","description":…
+5:15:14 PM [express] GET /api/communities 200 in 54ms :: [{"id":1,"name":"Sosiol","description":null…
+Error fetching posts: error: column posts.slug does not exist
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getPosts (file:///app/dist/index.js:273:18)
+at async file:///app/dist/index.js:557:22 {
+length: 108,
+severity: 'ERROR',
+code: '42703',
+detail: undefined,
+hint: undefined,
+position: '39',
+internalPosition: undefined,
+internalQuery: undefined,
+where: undefined,
+schema: undefined,
+table: undefined,
+column: undefined,
+dataType: undefined,
+constraint: undefined,
+file: 'parse_relation.c',
+line: '3665',
+routine: 'errorMissingColumn'
+}
+5:15:14 PM [express] GET /api/posts 304 in 54ms :: []
+⚠️  Slug column missing or error creating post with slug, trying without slug... column "slug" does not exist
+Failed to create post even without slug: column "slug" of relation "posts" does not exist
+5:15:23 PM [express] POST /api/posts 500 in 7ms :: {"message":"Failed to create post"}
+Error fetching posts: error: column posts.slug does not exist
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getPosts (file:///app/dist/index.js:273:18)
+at async file:///app/dist/index.js:557:22 {
+length: 108,
+severity: 'ERROR',
+code: '42703',
+detail: undefined,
+hint: undefined,
+position: '39',
+internalPosition: undefined,
+internalQuery: undefined,
+where: undefined,
+schema: undefined,
+table: undefined,
+column: undefined,
+dataType: undefined,
+constraint: undefined,
+file: 'parse_relation.c',
+line: '3665',
+routine: 'errorMissingColumn'
+}
+5:15:51 PM [express] GET /api/posts 304 in 29ms :: []
+5:15:51 PM [express] GET /api/communities 304 in 33ms :: [{"id":5,"name":"Philosophy","description":…
+5:15:51 PM [express] GET /api/communities 304 in 34ms :: [{"id":1,"name":"Sosiol","description":null…
+5:15:51 PM [express] GET /api/active-ad 304 in 24ms
+⚠️  Slug column missing or error creating post with slug, trying without slug... column "slug" does not exist
+Failed to create post even without slug: column "slug" of relation "posts" does not exist
+5:16:12 PM [express] POST /api/posts 500 in 11ms :: {"message":"Failed to create post"}
+5:16:29 PM [express] GET /api/active-ad 304 in 10ms
+5:39:29 PM [express] GET /api/posts/59 500 in 16ms :: {"message":"Failed to fetch post"}
+5:47:48 PM [express] GET /api/posts/44 500 in 12ms :: {"message":"Failed to fetch post"}
+5:49:31 PM [express] GET /api/communities 200 in 34ms :: [{"id":1,"name":"Sosiol","description":null…
+5:49:31 PM [express] GET /api/active-ad 200 in 27ms
+Error fetching posts: error: column posts.slug does not exist
+at /app/node_modules/pg-pool/index.js:45:11
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+at async DatabaseStorage.getPosts (file:///app/dist/index.js:273:18)
+at async file:///app/dist/index.js:557:22 {
+length: 108,
+severity: 'ERROR',
+code: '42703',
+detail: undefined,
+hint: undefined,
+position: '39',
+internalPosition: undefined,
+internalQuery: undefined,
+where: undefined,
+schema: undefined,
+table: undefined,
+column: undefined,
+dataType: undefined,
+constraint: undefined,
+file: 'parse_relation.c',
+line: '3665',
+routine: 'errorMissingColumn'
+}
+5:49:31 PM [express] GET /api/posts 200 in 36ms :: []
+5:49:31 PM [express] GET /api/communities 200 in 39ms :: [{"id":5,"name":"Philosophy","description":…
+⚠️  Slug column missing or error creating post with slug, trying without slug... column "slug" does not exist
+Failed to create post even without slug: column "slug" of relation "posts" does not exist
+5:49:44 PM [express] POST /api/posts 500 in 7ms :: {"message":"Failed to create post"}

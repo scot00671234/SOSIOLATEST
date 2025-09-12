@@ -149,40 +149,45 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPosts(communityId?: number, sort: 'hot' | 'new' = 'hot'): Promise<PostWithCommunity[]> {
-    const query = db
-      .select()
-      .from(posts)
-      .leftJoin(communities, eq(posts.communityId, communities.id));
-    
-    let result;
-    if (communityId) {
-      result = await query.where(eq(posts.communityId, communityId));
-    } else {
-      result = await query;
-    }
-    
-    const postsWithCommunity = result.map(row => ({
-      ...row.posts,
-      community: row.communities!
-    }));
-    
-    if (sort === 'new') {
-      // Sort by creation date (newest first)
-      return postsWithCommunity.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    } else {
-      // Calculate hot scores and sort using Reddit algorithm
-      const postsWithScores = postsWithCommunity.map(post => {
-        const hotScore = calculateHotScore(post.votes, new Date(post.createdAt));
-        return { ...post, hotScore };
-      });
+    try {
+      const query = db
+        .select()
+        .from(posts)
+        .leftJoin(communities, eq(posts.communityId, communities.id));
       
-      // Sort by hot score (highest first)
-      postsWithScores.sort((a, b) => b.hotScore - a.hotScore);
+      let result;
+      if (communityId) {
+        result = await query.where(eq(posts.communityId, communityId));
+      } else {
+        result = await query;
+      }
       
-      // Remove hotScore from final result
-      return postsWithScores.map(({ hotScore, ...post }) => post);
+      const postsWithCommunity = result.map(row => ({
+        ...row.posts,
+        community: row.communities!
+      }));
+      
+      if (sort === 'new') {
+        // Sort by creation date (newest first)
+        return postsWithCommunity.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      } else {
+        // Calculate hot scores and sort using Reddit algorithm
+        const postsWithScores = postsWithCommunity.map(post => {
+          const hotScore = calculateHotScore(post.votes, new Date(post.createdAt));
+          return { ...post, hotScore };
+        });
+        
+        // Sort by hot score (highest first)
+        postsWithScores.sort((a, b) => b.hotScore - a.hotScore);
+        
+        // Remove hotScore from final result
+        return postsWithScores.map(({ hotScore, ...post }) => post);
+      }
+    } catch (error: any) {
+      console.error('Error fetching posts:', error);
+      return []; // Return empty array instead of crashing
     }
   }
 
@@ -202,17 +207,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPost(insertPost: InsertPost): Promise<Post> {
-    // Generate unique slug from title
-    const slug = await generateUniqueSlug(insertPost.title);
-    
-    const [post] = await db
-      .insert(posts)
-      .values({
-        ...insertPost,
-        slug
-      })
-      .returning();
-    return post;
+    try {
+      // Generate unique slug from title
+      const slug = await generateUniqueSlug(insertPost.title);
+      
+      const [post] = await db
+        .insert(posts)
+        .values({
+          ...insertPost,
+          slug
+        })
+        .returning();
+      return post;
+    } catch (error: any) {
+      // Handle case where slug column doesn't exist in production
+      if (error.message?.includes('column "slug" does not exist') || error.message?.includes('slug')) {
+        console.log('⚠️  Slug column missing, creating post without slug...');
+        // For production databases without slug column, we need to cast the insertion
+        const postData = insertPost as any;
+        const [post] = await db
+          .insert(posts)
+          .values(postData)
+          .returning();
+        return post;
+      }
+      throw error;
+    }
   }
 
   async getPostBySlug(slug: string): Promise<PostWithCommunity | undefined> {

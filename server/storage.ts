@@ -263,7 +263,16 @@ export class DatabaseStorage implements IStorage {
           ...insertPost,
           slug
         })
-        .returning();
+        .returning({
+          id: posts.id,
+          title: posts.title,
+          slug: posts.slug,
+          content: posts.content,
+          communityId: posts.communityId,
+          votes: posts.votes,
+          commentCount: posts.commentCount,
+          createdAt: posts.createdAt
+        });
       return post;
     } catch (error: any) {
       console.log('⚠️  Slug column missing or error creating post with slug, trying without slug...', error.message);

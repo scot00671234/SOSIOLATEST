@@ -187,6 +187,7 @@ export class DatabaseStorage implements IStorage {
       
       const postsWithCommunity = result.map(row => ({
         ...row.post,
+        slug: null, // Set to null for compatibility with production databases without slug column
         community: row.community!
       }));
       
@@ -242,6 +243,7 @@ export class DatabaseStorage implements IStorage {
       
       return {
         ...result.post,
+        slug: null, // Set to null for compatibility with production databases without slug column
         community: result.community!
       };
     } catch (error: any) {
@@ -308,6 +310,7 @@ export class DatabaseStorage implements IStorage {
       
       return {
         ...result.post,
+        slug: null, // Set to null for compatibility with production databases without slug column
         community: result.community!
       };
     } catch (error: any) {

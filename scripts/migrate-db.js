@@ -44,6 +44,7 @@ async function runMigration() {
       CREATE TABLE IF NOT EXISTS posts (
         id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,
+        slug TEXT UNIQUE,
         content TEXT NOT NULL,
         community_id INTEGER NOT NULL REFERENCES communities(id),
         votes INTEGER DEFAULT 1 NOT NULL,
@@ -95,9 +96,13 @@ async function runMigration() {
         created_at TIMESTAMP DEFAULT NOW() NOT NULL
       );
 
+      -- Add slug column to existing posts table (idempotent)
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS slug TEXT;
+      
       -- Create indexes for performance
       CREATE INDEX IF NOT EXISTS idx_posts_community_id ON posts(community_id);
       CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
       CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
       CREATE INDEX IF NOT EXISTS idx_comments_parent_id ON comments(parent_id);
       CREATE INDEX IF NOT EXISTS idx_votes_target ON votes(target_type, target_id);
@@ -105,6 +110,54 @@ async function runMigration() {
       CREATE INDEX IF NOT EXISTS idx_community_notes_post_id ON community_notes(post_id);
       CREATE INDEX IF NOT EXISTS idx_community_notes_votes ON community_notes(votes DESC);
     `);
+
+    // Backfill slugs for existing posts
+    console.log('🔄 Backfilling slugs for existing posts...');
+    
+    // Get posts that don't have slugs
+    const postsResult = await pool.query('SELECT id, title FROM posts WHERE slug IS NULL OR slug = $1', ['']);
+    
+    if (postsResult.rows.length > 0) {
+      console.log(`📝 Found ${postsResult.rows.length} posts without slugs`);
+      
+      // Get all existing slugs to avoid duplicates
+      const existingSlugsResult = await pool.query('SELECT DISTINCT slug FROM posts WHERE slug IS NOT NULL AND slug != $1', ['']);
+      const existingSlugs = new Set(existingSlugsResult.rows.map(row => row.slug));
+      
+      // Function to create URL-friendly slug
+      function createPostSlug(title) {
+        return title.toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+          .replace(/-+/g, '-')
+          .substring(0, 100); // Limit slug length
+      }
+      
+      // Function to generate unique slug
+      function generateUniqueSlug(title, existingSlugs) {
+        const baseSlug = createPostSlug(title);
+        let uniqueSlug = baseSlug;
+        let counter = 1;
+        
+        while (existingSlugs.has(uniqueSlug)) {
+          uniqueSlug = `${baseSlug}-${counter}`;
+          counter++;
+        }
+        
+        existingSlugs.add(uniqueSlug);
+        return uniqueSlug;
+      }
+      
+      // Update each post with a unique slug
+      for (const post of postsResult.rows) {
+        const slug = generateUniqueSlug(post.title, existingSlugs);
+        await pool.query('UPDATE posts SET slug = $1 WHERE id = $2', [slug, post.id]);
+      }
+      
+      console.log(`✅ Successfully generated slugs for ${postsResult.rows.length} posts`);
+    } else {
+      console.log('✅ All posts already have slugs');
+    }
 
     console.log('✅ Database migration completed successfully!');
     console.log('📊 All tables created:');

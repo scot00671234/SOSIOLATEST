@@ -48,6 +48,7 @@ export default function PostPage() {
   const queryClient = useQueryClient();
   const [showCommunityNotes, setShowCommunityNotes] = useState(false);
   const [commentSort, setCommentSort] = useState<'hot' | 'new'>('hot');
+  const [visibleComments, setVisibleComments] = useState(10); // Show first 10 comments by default
 
   // Determine if this is a slug-based or ID-based URL
   const isSlugBased = !!params.slug;
@@ -75,6 +76,7 @@ export default function PostPage() {
 
   const handleCommentSortChange = (sort: 'hot' | 'new') => {
     setCommentSort(sort);
+    setVisibleComments(10); // Reset to initial count when sorting changes
   };
 
   const form = useForm<CommentData>({
@@ -268,13 +270,25 @@ export default function PostPage() {
                     </div>
                   ) : comments?.length ? (
                     <div className="space-y-4">
-                      {comments.map((comment) => (
+                      {comments.slice(0, visibleComments).map((comment) => (
                         <Comment
                           key={comment.id}
                           comment={comment}
                           postId={postId}
                         />
                       ))}
+                      
+                      {/* Load More Comments Button */}
+                      {comments.length > visibleComments && (
+                        <div className="text-center pt-4">
+                          <button
+                            onClick={() => setVisibleComments(prev => prev + 10)}
+                            className="text-sm text-muted-foreground hover:text-foreground underline transition-colors"
+                          >
+                            Load {Math.min(comments.length - visibleComments, 10)} more comments ({comments.length - visibleComments} remaining)
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="text-center py-8">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import VoteButton from "./vote-button";
 import type { CommentWithChildren } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,6 +29,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const [replyContent, setReplyContent] = useState("");
   const [isContentExpanded, setIsContentExpanded] = useState(false);
   const [visibleReplies, setVisibleReplies] = useState(2); // Show first 2 replies by default
+  const [showThreadDialog, setShowThreadDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const replyMutation = useMutation({
@@ -70,6 +72,25 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const shouldShowMoreButton = totalReplies > visibleReplies;
   const displayedReplies = hasChildren ? comment.children.slice(0, visibleReplies) : [];
   const remainingReplies = totalReplies - visibleReplies;
+  
+  // Deep thread handling
+  const MAX_VISIBLE_DEPTH = 4;
+  const isDeepThread = depth >= MAX_VISIBLE_DEPTH;
+  
+  // Flatten comment tree for dialog display
+  const flattenCommentTree = (comments: CommentWithChildren[]): CommentWithChildren[] => {
+    const result: CommentWithChildren[] = [];
+    const flatten = (commentList: CommentWithChildren[]) => {
+      commentList.forEach(c => {
+        result.push(c);
+        if (c.children && c.children.length > 0) {
+          flatten(c.children);
+        }
+      });
+    };
+    flatten(comments);
+    return result;
+  };
 
   return (
     <div className={`border border-border rounded-lg p-4 w-full overflow-x-hidden break-words ${
@@ -150,25 +171,54 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
       {/* Nested Replies */}
       {hasChildren && (
         <div className="mt-4 space-y-3 w-full overflow-x-hidden">
-          {displayedReplies.map((childComment) => (
-            <Comment
-              key={childComment.id}
-              comment={childComment}
-              postId={postId}
-              depth={depth + 1}
-            />
-          ))}
-          
-          {/* Show More Replies Button */}
-          {shouldShowMoreButton && (
-            <div className="pt-2">
-              <button
-                onClick={() => setVisibleReplies(prev => prev + REPLIES_INCREMENT)}
-                className="text-sm text-muted-foreground hover:text-foreground underline transition-colors flex items-center gap-1"
-              >
-                Show {Math.min(remainingReplies, REPLIES_INCREMENT)} more {remainingReplies === 1 ? 'reply' : 'replies'} ({remainingReplies} remaining)
-              </button>
-            </div>
+          {isDeepThread ? (
+            /* Continue this thread for deep nesting */
+            <Dialog open={showThreadDialog} onOpenChange={setShowThreadDialog}>
+              <DialogTrigger asChild>
+                <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                  Continue this thread ({totalReplies} {totalReplies === 1 ? 'reply' : 'replies'})
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Thread Continuation</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  {flattenCommentTree(comment.children).map((childComment, index) => (
+                    <Comment
+                      key={childComment.id}
+                      comment={childComment}
+                      postId={postId}
+                      depth={0} // Reset depth for flat display
+                    />
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            /* Normal nested display for shallow threads */
+            <>
+              {displayedReplies.map((childComment) => (
+                <Comment
+                  key={childComment.id}
+                  comment={childComment}
+                  postId={postId}
+                  depth={depth + 1}
+                />
+              ))}
+              
+              {/* Show More Replies Button */}
+              {shouldShowMoreButton && (
+                <div className="pt-2">
+                  <button
+                    onClick={() => setVisibleReplies(prev => prev + REPLIES_INCREMENT)}
+                    className="text-sm text-muted-foreground hover:text-foreground underline transition-colors flex items-center gap-1"
+                  >
+                    Show {Math.min(remainingReplies, REPLIES_INCREMENT)} more {remainingReplies === 1 ? 'reply' : 'replies'} ({remainingReplies} remaining)
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

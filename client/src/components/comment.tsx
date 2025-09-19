@@ -66,30 +66,30 @@ export default function Comment({ comment, postId, depth = 0, parentVisualDepth 
   const baseGutter = visualDepth > parentVisualDepth ? 16 : 0; // Only add base padding when visual depth increases
   const showThreadLine = depth > 0;
   
-  // Create rail elements for threading - improved for infinite depth
+  // Create rail elements for threading - improved for infinite depth with no click interference
   const ThreadRail = () => {
     if (depth === 0) return null;
     
     return (
-      <div className="absolute left-0 top-0 bottom-0 flex">
+      <div className="absolute left-0 top-0 bottom-0 flex pointer-events-none z-0">
         {/* Show visual thread lines up to the cap */}
         {Array.from({ length: visualDepth }, (_, i) => (
           <div
             key={i}
-            className="w-5 flex-shrink-0 relative"
+            className="w-5 flex-shrink-0 relative pointer-events-none"
           >
-            <div className="absolute left-2.5 top-0 bottom-0 w-px bg-border/20" />
+            <div className="absolute left-2.5 top-0 bottom-0 w-px bg-border/20 pointer-events-none" />
             {i === visualDepth - 1 && (
-              <div className="absolute left-2.5 top-6 w-2.5 h-px bg-border/20" />
+              <div className="absolute left-2.5 top-6 w-2.5 h-px bg-border/20 pointer-events-none" />
             )}
           </div>
         ))}
         {/* For very deep threads beyond visual cap, show a thicker continuing line with depth indicator */}
         {depth > MAX_INDENT_LEVEL && (
-          <div className="w-5 flex-shrink-0 relative">
-            <div className="absolute left-2.5 top-0 bottom-0 w-0.5 bg-border/30 rounded-full" />
+          <div className="w-5 flex-shrink-0 relative pointer-events-none">
+            <div className="absolute left-2.5 top-0 bottom-0 w-0.5 bg-border/30 rounded-full pointer-events-none" />
             {/* Add small depth indicator for very deep threads */}
-            <div className="absolute left-2 top-6 w-2 h-2 bg-border/20 rounded-full" />
+            <div className="absolute left-2 top-6 w-2 h-2 bg-border/20 rounded-full pointer-events-none" />
           </div>
         )}
       </div>
@@ -138,8 +138,8 @@ export default function Comment({ comment, postId, depth = 0, parentVisualDepth 
       style={{ paddingLeft: `${localIndent + baseGutter}px` }}
     >
       <ThreadRail />
-      <div className={`${depth > 0 ? 'border-t border-border/20 pt-3' : 'border border-border rounded-lg p-4'}`}>
-      <div className="flex items-start space-x-3 w-full min-w-0">
+      <div className={`relative z-10 ${depth > 0 ? 'border-t border-border/20 pt-3' : 'border border-border rounded-lg p-4'}`}>
+      <div className="relative z-20 flex items-start space-x-3 w-full min-w-0">
         {/* Vote Column */}
         <div className="flex-none">
           <VoteButton
@@ -172,7 +172,7 @@ export default function Comment({ comment, postId, depth = 0, parentVisualDepth 
             variant="ghost" 
             size="sm" 
             onClick={() => setShowReplyForm(!showReplyForm)}
-            className="text-muted-foreground hover:text-foreground h-auto p-0 transition-colors"
+            className="relative z-30 text-muted-foreground hover:text-foreground h-auto p-1 px-2 transition-colors pointer-events-auto"
           >
             Reply
           </Button>

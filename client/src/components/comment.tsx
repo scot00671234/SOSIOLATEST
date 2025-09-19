@@ -26,6 +26,7 @@ function formatTimeAgo(date: Date | string): string {
 export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
+  const [isContentExpanded, setIsContentExpanded] = useState(false);
   const queryClient = useQueryClient();
 
   const replyMutation = useMutation({
@@ -53,6 +54,13 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
 
   const paddingLeft = Math.min(depth * 16, 64); // Max 4 levels deep
   const showThreadLine = depth > 0;
+  
+  // Content clamping logic
+  const CONTENT_LIMIT = 280;
+  const shouldClampContent = comment.content.length > CONTENT_LIMIT;
+  const displayContent = shouldClampContent && !isContentExpanded 
+    ? comment.content.slice(0, CONTENT_LIMIT) + "..." 
+    : comment.content;
 
   return (
     <div className={`border border-border rounded-lg p-4 w-full overflow-x-hidden break-words ${
@@ -75,7 +83,17 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
             <span>{formatTimeAgo(comment.createdAt)}</span>
           </div>
           
-          <div className="mb-3 break-words overflow-wrap-anywhere whitespace-pre-wrap">{comment.content}</div>
+          <div className="mb-3 break-words overflow-wrap-anywhere whitespace-pre-wrap">
+            {displayContent}
+            {shouldClampContent && (
+              <button
+                onClick={() => setIsContentExpanded(!isContentExpanded)}
+                className="ml-2 text-sm text-muted-foreground hover:text-foreground underline transition-colors"
+              >
+                {isContentExpanded ? "Show less" : "Read more"}
+              </button>
+            )}
+          </div>
           
           <Button 
             variant="ghost" 

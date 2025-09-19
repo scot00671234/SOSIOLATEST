@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import VoteButton from "./vote-button";
@@ -10,6 +10,7 @@ interface CommentProps {
   comment: CommentWithChildren;
   postId: number;
   depth?: number;
+  parentVisualDepth?: number;
 }
 
 function formatTimeAgo(date: Date | string): string {
@@ -23,7 +24,7 @@ function formatTimeAgo(date: Date | string): string {
   return `${Math.floor(diffInSeconds / 86400)} days ago`;
 }
 
-export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
+export default function Comment({ comment, postId, depth = 0, parentVisualDepth = 0 }: CommentProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [isContentExpanded, setIsContentExpanded] = useState(false);
@@ -54,28 +55,40 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
     await replyMutation.mutateAsync(replyContent.trim());
   };
 
-  // Thread rail styling
-  const indentWidth = 24; // Increased for better visibility
-  const paddingLeft = Math.min(depth * indentWidth, indentWidth * 4); // Max 4 levels
+  // Reddit-style depth capping constants
+  const MAX_INDENT_LEVEL = 10; // Reddit's visual indentation limit
+  const CONTINUE_THREAD_LEVEL = 11; // When to show "Continue this thread"
+  const indentWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20; // Responsive indent
+  
+  // Calculate visual depth (capped) vs actual depth
+  const visualDepth = Math.min(depth, MAX_INDENT_LEVEL);
+  const localIndent = (visualDepth - parentVisualDepth) * indentWidth;
+  const baseGutter = visualDepth > parentVisualDepth ? 16 : 0; // Only add base padding when visual depth increases
   const showThreadLine = depth > 0;
   
-  // Create rail elements for threading
+  // Create rail elements for threading - Reddit-style with depth capping
   const ThreadRail = () => {
     if (depth === 0) return null;
     
     return (
       <div className="absolute left-0 top-0 bottom-0 flex">
-        {Array.from({ length: depth }, (_, i) => (
+        {Array.from({ length: visualDepth }, (_, i) => (
           <div
             key={i}
-            className="w-6 flex-shrink-0 relative"
+            className="w-5 flex-shrink-0 relative"
           >
-            <div className="absolute left-3 top-0 bottom-0 w-px bg-border/30" />
-            {i === depth - 1 && (
-              <div className="absolute left-3 top-6 w-3 h-px bg-border/30" />
+            <div className="absolute left-2.5 top-0 bottom-0 w-px bg-border/20" />
+            {i === visualDepth - 1 && (
+              <div className="absolute left-2.5 top-6 w-2.5 h-px bg-border/20" />
             )}
           </div>
         ))}
+        {/* If we're past the visual cap, show a single continuing line */}
+        {depth > MAX_INDENT_LEVEL && (
+          <div className="w-5 flex-shrink-0 relative">
+            <div className="absolute left-2.5 top-0 bottom-0 w-px bg-border/10" />
+          </div>
+        )}
       </div>
     );
   };
@@ -95,28 +108,31 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const displayedReplies = hasChildren ? comment.children.slice(0, visibleReplies) : [];
   const remainingReplies = totalReplies - visibleReplies;
   
-  // Deep thread handling
-  const MAX_VISIBLE_DEPTH = 4;
-  const isDeepThread = depth >= MAX_VISIBLE_DEPTH;
+  // Deep thread handling - only for very deep threads like Reddit
+  const isDeepThread = depth >= CONTINUE_THREAD_LEVEL;
   
-  // Count all descendants for "continue thread" display
-  const countAllDescendants = (comments: CommentWithChildren[]): number => {
-    let count = 0;
-    comments.forEach(c => {
-      count += 1;
-      if (c.children && c.children.length > 0) {
-        count += countAllDescendants(c.children);
-      }
-    });
-    return count;
-  };
-  
-  const totalDescendants = hasChildren ? countAllDescendants(comment.children) : 0;
+  // Count all descendants for "continue thread" display (memoized for performance)
+  const totalDescendants = useMemo(() => {
+    if (!hasChildren) return 0;
+    
+    const countAllDescendants = (comments: CommentWithChildren[]): number => {
+      let count = 0;
+      comments.forEach(c => {
+        count += 1;
+        if (c.children && c.children.length > 0) {
+          count += countAllDescendants(c.children);
+        }
+      });
+      return count;
+    };
+    
+    return countAllDescendants(comment.children);
+  }, [hasChildren, comment.children]);
 
   return (
     <div 
       className="relative w-full overflow-x-hidden break-words py-3"
-      style={{ paddingLeft: `${paddingLeft + 16}px` }}
+      style={{ paddingLeft: `${localIndent + baseGutter}px` }}
     >
       <ThreadRail />
       <div className={`${depth > 0 ? 'border-t border-border/20 pt-3' : 'border border-border rounded-lg p-4'}`}>
@@ -215,6 +231,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
                       comment={childComment}
                       postId={postId}
                       depth={depth + 1}
+                      parentVisualDepth={visualDepth}
                     />
                   ))}
                   
@@ -242,6 +259,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
                   comment={childComment}
                   postId={postId}
                   depth={depth + 1}
+                  parentVisualDepth={visualDepth}
                 />
               ))}
               

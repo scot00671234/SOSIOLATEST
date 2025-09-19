@@ -55,9 +55,9 @@ export default function Comment({ comment, postId, depth = 0, parentVisualDepth 
     await replyMutation.mutateAsync(replyContent.trim());
   };
 
-  // Reddit-style depth capping constants
-  const MAX_INDENT_LEVEL = 10; // Reddit's visual indentation limit
-  const CONTINUE_THREAD_LEVEL = 11; // When to show "Continue this thread"
+  // Visual depth capping for clean UI - but allow infinite replies
+  const MAX_INDENT_LEVEL = 8; // Reduced visual indentation limit for cleaner mobile experience
+  const CONTINUE_THREAD_LEVEL = 999; // Effectively disable "Continue this thread" - allow infinite nesting
   const indentWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20; // Responsive indent
   
   // Calculate visual depth (capped) vs actual depth
@@ -66,12 +66,13 @@ export default function Comment({ comment, postId, depth = 0, parentVisualDepth 
   const baseGutter = visualDepth > parentVisualDepth ? 16 : 0; // Only add base padding when visual depth increases
   const showThreadLine = depth > 0;
   
-  // Create rail elements for threading - Reddit-style with depth capping
+  // Create rail elements for threading - improved for infinite depth
   const ThreadRail = () => {
     if (depth === 0) return null;
     
     return (
       <div className="absolute left-0 top-0 bottom-0 flex">
+        {/* Show visual thread lines up to the cap */}
         {Array.from({ length: visualDepth }, (_, i) => (
           <div
             key={i}
@@ -83,10 +84,12 @@ export default function Comment({ comment, postId, depth = 0, parentVisualDepth 
             )}
           </div>
         ))}
-        {/* If we're past the visual cap, show a single continuing line */}
+        {/* For very deep threads beyond visual cap, show a thicker continuing line with depth indicator */}
         {depth > MAX_INDENT_LEVEL && (
           <div className="w-5 flex-shrink-0 relative">
-            <div className="absolute left-2.5 top-0 bottom-0 w-px bg-border/10" />
+            <div className="absolute left-2.5 top-0 bottom-0 w-0.5 bg-border/30 rounded-full" />
+            {/* Add small depth indicator for very deep threads */}
+            <div className="absolute left-2 top-6 w-2 h-2 bg-border/20 rounded-full" />
           </div>
         )}
       </div>

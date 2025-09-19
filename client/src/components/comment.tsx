@@ -77,12 +77,13 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const MAX_VISIBLE_DEPTH = 4;
   const isDeepThread = depth >= MAX_VISIBLE_DEPTH;
   
-  // Flatten comment tree for dialog display
+  // Flatten comment tree for dialog display (strip children to avoid duplicate rendering)
   const flattenCommentTree = (comments: CommentWithChildren[]): CommentWithChildren[] => {
     const result: CommentWithChildren[] = [];
     const flatten = (commentList: CommentWithChildren[]) => {
       commentList.forEach(c => {
-        result.push(c);
+        // Strip children to prevent recursive rendering in dialog
+        result.push({ ...c, children: [] });
         if (c.children && c.children.length > 0) {
           flatten(c.children);
         }
@@ -113,7 +114,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
             <span>{formatTimeAgo(comment.createdAt)}</span>
           </div>
           
-          <div className="mb-3 break-words overflow-wrap-anywhere whitespace-pre-wrap">
+          <div className="mb-3 break-words [overflow-wrap:anywhere] whitespace-pre-wrap">
             {displayContent}
             {shouldClampContent && (
               <button

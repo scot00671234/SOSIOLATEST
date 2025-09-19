@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import VoteButton from "./vote-button";
 import type { CommentWithChildren } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,7 +28,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const [replyContent, setReplyContent] = useState("");
   const [isContentExpanded, setIsContentExpanded] = useState(false);
   const [visibleReplies, setVisibleReplies] = useState(2); // Show first 2 replies by default
-  const [showThreadDialog, setShowThreadDialog] = useState(false);
+  const [isDeepThreadExpanded, setIsDeepThreadExpanded] = useState(false);
   const queryClient = useQueryClient();
 
   const replyMutation = useMutation({
@@ -55,8 +54,31 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
     await replyMutation.mutateAsync(replyContent.trim());
   };
 
-  const paddingLeft = Math.min(depth * 16, 64); // Max 4 levels deep
+  // Thread rail styling
+  const indentWidth = 24; // Increased for better visibility
+  const paddingLeft = Math.min(depth * indentWidth, indentWidth * 4); // Max 4 levels
   const showThreadLine = depth > 0;
+  
+  // Create rail elements for threading
+  const ThreadRail = () => {
+    if (depth === 0) return null;
+    
+    return (
+      <div className="absolute left-0 top-0 bottom-0 flex">
+        {Array.from({ length: depth }, (_, i) => (
+          <div
+            key={i}
+            className="w-6 flex-shrink-0 relative"
+          >
+            <div className="absolute left-3 top-0 bottom-0 w-px bg-border/30" />
+            {i === depth - 1 && (
+              <div className="absolute left-3 top-6 w-3 h-px bg-border/30" />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
   
   // Content clamping logic
   const CONTENT_LIMIT = 280;
@@ -77,26 +99,27 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const MAX_VISIBLE_DEPTH = 4;
   const isDeepThread = depth >= MAX_VISIBLE_DEPTH;
   
-  // Flatten comment tree for dialog display (strip children to avoid duplicate rendering)
-  const flattenCommentTree = (comments: CommentWithChildren[]): CommentWithChildren[] => {
-    const result: CommentWithChildren[] = [];
-    const flatten = (commentList: CommentWithChildren[]) => {
-      commentList.forEach(c => {
-        // Strip children to prevent recursive rendering in dialog
-        result.push({ ...c, children: [] });
-        if (c.children && c.children.length > 0) {
-          flatten(c.children);
-        }
-      });
-    };
-    flatten(comments);
-    return result;
+  // Count all descendants for "continue thread" display
+  const countAllDescendants = (comments: CommentWithChildren[]): number => {
+    let count = 0;
+    comments.forEach(c => {
+      count += 1;
+      if (c.children && c.children.length > 0) {
+        count += countAllDescendants(c.children);
+      }
+    });
+    return count;
   };
+  
+  const totalDescendants = hasChildren ? countAllDescendants(comment.children) : 0;
 
   return (
-    <div className={`border border-border rounded-lg p-4 w-full overflow-x-hidden break-words ${
-      showThreadLine ? 'border-l-2 border-l-muted-foreground/20' : ''
-    }`} style={{ paddingLeft: `${paddingLeft + 16}px` }}>
+    <div 
+      className="relative w-full overflow-x-hidden break-words py-3"
+      style={{ paddingLeft: `${paddingLeft + 16}px` }}
+    >
+      <ThreadRail />
+      <div className={`${depth > 0 ? 'border-t border-border/20 pt-3' : 'border border-border rounded-lg p-4'}`}>
       <div className="flex items-start space-x-3 w-full min-w-0">
         {/* Vote Column */}
         <div className="flex-none">
@@ -171,34 +194,48 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
       
       {/* Nested Replies */}
       {hasChildren && (
-        <div className="mt-4 space-y-3 w-full overflow-x-hidden">
+        <div className="mt-3 w-full overflow-x-hidden">
           {isDeepThread ? (
-            /* Continue this thread for deep nesting */
-            <Dialog open={showThreadDialog} onOpenChange={setShowThreadDialog}>
-              <DialogTrigger asChild>
-                <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                  Continue this thread ({totalReplies} {totalReplies === 1 ? 'reply' : 'replies'})
-                </button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Thread Continuation</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  {flattenCommentTree(comment.children).map((childComment, index) => (
+            /* Inline Continue this thread for deep nesting */
+            <div>
+              <button
+                onClick={() => setIsDeepThreadExpanded(!isDeepThreadExpanded)}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 py-2"
+                data-testid={`button-continue-thread-${comment.id}`}
+              >
+                {isDeepThreadExpanded ? 'Collapse' : 'Continue'} this thread ({totalDescendants} {totalDescendants === 1 ? 'reply' : 'replies'})
+              </button>
+              
+              {/* Expanded deep thread content */}
+              {isDeepThreadExpanded && (
+                <div className="space-y-0">
+                  {displayedReplies.map((childComment) => (
                     <Comment
                       key={childComment.id}
                       comment={childComment}
                       postId={postId}
-                      depth={0} // Reset depth for flat display
+                      depth={depth + 1}
                     />
                   ))}
+                  
+                  {/* Show More Replies Button */}
+                  {shouldShowMoreButton && (
+                    <div className="py-2 pl-6">
+                      <button
+                        onClick={() => setVisibleReplies(prev => prev + REPLIES_INCREMENT)}
+                        className="text-sm text-muted-foreground hover:text-foreground underline transition-colors"
+                        data-testid={`button-show-more-replies-${comment.id}`}
+                      >
+                        Show {Math.min(remainingReplies, REPLIES_INCREMENT)} more {remainingReplies === 1 ? 'reply' : 'replies'} ({remainingReplies} remaining)
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </DialogContent>
-            </Dialog>
+              )}
+            </div>
           ) : (
             /* Normal nested display for shallow threads */
-            <>
+            <div className="space-y-0">
               {displayedReplies.map((childComment) => (
                 <Comment
                   key={childComment.id}
@@ -210,19 +247,21 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
               
               {/* Show More Replies Button */}
               {shouldShowMoreButton && (
-                <div className="pt-2">
+                <div className="py-2 pl-6">
                   <button
                     onClick={() => setVisibleReplies(prev => prev + REPLIES_INCREMENT)}
-                    className="text-sm text-muted-foreground hover:text-foreground underline transition-colors flex items-center gap-1"
+                    className="text-sm text-muted-foreground hover:text-foreground underline transition-colors"
+                    data-testid={`button-show-more-replies-${comment.id}`}
                   >
                     Show {Math.min(remainingReplies, REPLIES_INCREMENT)} more {remainingReplies === 1 ? 'reply' : 'replies'} ({remainingReplies} remaining)
                   </button>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }

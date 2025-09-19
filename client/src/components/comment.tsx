@@ -27,6 +27,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [isContentExpanded, setIsContentExpanded] = useState(false);
+  const [visibleReplies, setVisibleReplies] = useState(2); // Show first 2 replies by default
   const queryClient = useQueryClient();
 
   const replyMutation = useMutation({
@@ -61,6 +62,14 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
   const displayContent = shouldClampContent && !isContentExpanded 
     ? comment.content.slice(0, CONTENT_LIMIT) + "..." 
     : comment.content;
+  
+  // Reply limiting logic
+  const REPLIES_INCREMENT = 3; // Show 3 more replies when "show more" is clicked
+  const hasChildren = comment.children && comment.children.length > 0;
+  const totalReplies = hasChildren ? comment.children.length : 0;
+  const shouldShowMoreButton = totalReplies > visibleReplies;
+  const displayedReplies = hasChildren ? comment.children.slice(0, visibleReplies) : [];
+  const remainingReplies = totalReplies - visibleReplies;
 
   return (
     <div className={`border border-border rounded-lg p-4 w-full overflow-x-hidden break-words ${
@@ -139,9 +148,9 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
       </div>
       
       {/* Nested Replies */}
-      {comment.children && comment.children.length > 0 && (
+      {hasChildren && (
         <div className="mt-4 space-y-3 w-full overflow-x-hidden">
-          {comment.children.map((childComment) => (
+          {displayedReplies.map((childComment) => (
             <Comment
               key={childComment.id}
               comment={childComment}
@@ -149,6 +158,18 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
               depth={depth + 1}
             />
           ))}
+          
+          {/* Show More Replies Button */}
+          {shouldShowMoreButton && (
+            <div className="pt-2">
+              <button
+                onClick={() => setVisibleReplies(prev => prev + REPLIES_INCREMENT)}
+                className="text-sm text-muted-foreground hover:text-foreground underline transition-colors flex items-center gap-1"
+              >
+                Show {Math.min(remainingReplies, REPLIES_INCREMENT)} more {remainingReplies === 1 ? 'reply' : 'replies'} ({remainingReplies} remaining)
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

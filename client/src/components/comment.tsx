@@ -51,26 +51,31 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
     await replyMutation.mutateAsync(replyContent.trim());
   };
 
-  const marginLeft = Math.min(depth * 16, 64); // Max 4 levels deep
+  const paddingLeft = Math.min(depth * 16, 64); // Max 4 levels deep
+  const showThreadLine = depth > 0;
 
   return (
-    <div className="border border-border rounded-lg p-4" style={{ marginLeft: `${marginLeft}px` }}>
-      <div className="flex items-start space-x-3">
+    <div className={`border border-border rounded-lg p-4 w-full overflow-x-hidden break-words ${
+      showThreadLine ? 'border-l-2 border-l-muted-foreground/20' : ''
+    }`} style={{ paddingLeft: `${paddingLeft + 16}px` }}>
+      <div className="flex items-start space-x-3 w-full min-w-0">
         {/* Vote Column */}
-        <VoteButton
-          targetType="comment"
-          targetId={comment.id}
-          currentVotes={comment.votes}
-          vertical={true}
-        />
+        <div className="flex-none">
+          <VoteButton
+            targetType="comment"
+            targetId={comment.id}
+            currentVotes={comment.votes}
+            vertical={true}
+          />
+        </div>
         
         {/* Comment Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <div className="text-xs text-muted-foreground mb-2">
             <span>{formatTimeAgo(comment.createdAt)}</span>
           </div>
           
-          <p className="mb-3">{comment.content}</p>
+          <div className="mb-3 break-words overflow-wrap-anywhere whitespace-pre-wrap">{comment.content}</div>
           
           <Button 
             variant="ghost" 
@@ -117,7 +122,7 @@ export default function Comment({ comment, postId, depth = 0 }: CommentProps) {
       
       {/* Nested Replies */}
       {comment.children && comment.children.length > 0 && (
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-3 w-full overflow-x-hidden">
           {comment.children.map((childComment) => (
             <Comment
               key={childComment.id}

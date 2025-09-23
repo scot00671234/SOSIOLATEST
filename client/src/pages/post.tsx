@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,6 +44,7 @@ function formatTimeAgo(date: Date | string): string {
 
 export default function PostPage() {
   const params = useParams<{ id?: string; title?: string; slug?: string }>();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showCommunityNotes, setShowCommunityNotes] = useState(false);
@@ -63,10 +64,18 @@ export default function PostPage() {
   const { data: post, isLoading: postLoading } = useQuery<PostWithCommunity>({
     queryKey: isSlugBased ? ["/api/posts/by-slug", postSlug] : ["/api/posts", postId],
     queryFn: isSlugBased 
-      ? () => fetch(`/api/posts/by-slug/${postSlug}`).then(res => res.json())
+      ? () => fetch(`/api/posts/by-slug/${encodeURIComponent(postSlug!)}`).then(res => res.json())
       : () => fetch(`/api/posts/${postId}`).then(res => res.json()),
     enabled: isSlugBased ? !!postSlug : postId > 0,
   });
+
+  // Canonical URL redirect: if accessed via ID but post has slug, redirect to slug URL
+  useEffect(() => {
+    if (post && !isSlugBased && post.slug) {
+      // Replace current URL with canonical slug-based URL
+      setLocation(`/post/${post.slug}`, { replace: true });
+    }
+  }, [post, isSlugBased, setLocation]);
 
   const { data: comments, isLoading: commentsLoading } = useQuery<CommentWithChildren[]>({
     queryKey: ["/api/posts", post?.id, "comments", commentSort],

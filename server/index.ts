@@ -1,3 +1,20 @@
+// Node.js 18 File API polyfill for undici/cheerio compatibility
+if (typeof globalThis.File === 'undefined') {
+  class File extends Blob {
+    name: string;
+    lastModified: number;
+    webkitRelativePath: string = '';
+    
+    constructor(bits: BlobPart[], name: string, opts: FilePropertyBag = {}) { 
+      super(bits, opts); 
+      this.name = name; 
+      this.lastModified = opts.lastModified ?? Date.now(); 
+    }
+    get [Symbol.toStringTag]() { return 'File'; }
+  }
+  (globalThis as any).File = File;
+}
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";

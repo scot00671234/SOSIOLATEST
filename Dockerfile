@@ -4,7 +4,7 @@
 # DO NOT ADD CADDY OR ANY REVERSE PROXY - THE APP HANDLES EVERYTHING
 
 # Use Ubuntu base to avoid Alpine shell issues
-FROM node:18-bullseye
+FROM node:20-bullseye
 
 WORKDIR /app
 

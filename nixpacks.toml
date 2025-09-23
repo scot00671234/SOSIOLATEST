@@ -10,7 +10,7 @@ NIXPACKS_NO_CADDY = "1"
 DISABLE_CADDY = "true"
 
 [phases.setup]
-nixPkgs = ["nodejs_18"]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
 cmds = ["npm ci"]

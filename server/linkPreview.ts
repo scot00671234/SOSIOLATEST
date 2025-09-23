@@ -1,4 +1,5 @@
-import ogs from 'open-graph-scraper';
+// Dynamic import to prevent Node.js 18 boot crash
+// import ogs from 'open-graph-scraper';
 import urlRegex from 'url-regex';
 import { URL } from 'url';
 
@@ -67,6 +68,8 @@ export async function extractLinkPreview(url: string): Promise<LinkPreview | nul
       return null;
     }
 
+    // Dynamic import for Node.js 18 compatibility
+    const { default: ogs } = await import('open-graph-scraper');
     const { result } = await ogs({
       url,
       timeout: 5000,

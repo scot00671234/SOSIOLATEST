@@ -47,6 +47,56 @@ function isValidPublicUrl(url: string): boolean {
   }
 }
 
+function isYouTubeUrl(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+    return (
+      (hostname === 'youtube.com' || hostname === 'www.youtube.com') && parsedUrl.pathname === '/watch' && parsedUrl.searchParams.has('v')
+    ) || 
+    (hostname === 'youtu.be' && parsedUrl.pathname.length > 1);
+  } catch {
+    return false;
+  }
+}
+
+async function extractYouTubePreview(url: string): Promise<LinkPreview | null> {
+  try {
+    // Use YouTube's oEmbed API for better video-specific data
+    const oEmbedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+    
+    // Use AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    const response = await fetch(oEmbedUrl, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; LinkPreview/1.0)'
+      }
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json() as any;
+    
+    return {
+      url,
+      title: data.title,
+      description: `Watch "${data.title}" on YouTube`,
+      image: data.thumbnail_url,
+      siteName: 'YouTube',
+    };
+  } catch (error) {
+    console.error('Error extracting YouTube preview:', error);
+    return null;
+  }
+}
+
 export async function extractLinkPreview(url: string): Promise<LinkPreview | null> {
   try {
     // Validate URL format
@@ -66,6 +116,15 @@ export async function extractLinkPreview(url: string): Promise<LinkPreview | nul
     if (!isValidPublicUrl(url)) {
       console.warn('Blocked potentially dangerous URL:', url);
       return null;
+    }
+
+    // Check if this is a YouTube URL and handle it specifically
+    if (isYouTubeUrl(url)) {
+      const youtubePreview = await extractYouTubePreview(url);
+      if (youtubePreview) {
+        return youtubePreview;
+      }
+      // If YouTube-specific extraction fails, fall back to generic scraping
     }
 
     // Dynamic import for Node.js 18 compatibility

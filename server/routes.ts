@@ -216,12 +216,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/comments", async (req, res) => {
     try {
       const data = insertCommentSchema.parse(req.body);
+      console.log("Creating comment with data:", data);
       const comment = await storage.createComment(data);
       res.status(201).json(comment);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Comment validation error:", error.errors);
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
+      console.error("Comment creation error:", error);
       res.status(500).json({ message: "Failed to create comment" });
     }
   });

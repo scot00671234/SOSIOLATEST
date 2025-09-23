@@ -23,21 +23,54 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
-// Slug generation functions
-function createPostSlug(title: string): string {
-  return title.toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .replace(/-+/g, '-')
-    .substring(0, 100); // Limit slug length
+// Improved slug generation functions for international characters
+function createPostSlug(title: string, postId?: number): string {
+  // First, try to transliterate international characters to ASCII-safe equivalents
+  let slug = title
+    .toLowerCase()
+    // Replace common international characters with ASCII equivalents
+    .replace(/[àáâãäå]/g, 'a')
+    .replace(/[èéêë]/g, 'e')
+    .replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o')
+    .replace(/[ùúûü]/g, 'u')
+    .replace(/[ýÿ]/g, 'y')
+    .replace(/[ñ]/g, 'n')
+    .replace(/[ç]/g, 'c')
+    .replace(/[ß]/g, 'ss')
+    // Remove HTML tags and special characters
+    .replace(/<[^>]*>/g, '')
+    // Replace spaces and non-alphanumeric characters with hyphens
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    // Remove leading/trailing hyphens
+    .replace(/^-+|-+$/g, '')
+    // Limit length
+    .substring(0, 80);
+
+  // If slug is empty or too short after processing (common with non-Latin scripts)
+  if (!slug || slug.length < 2) {
+    // Use fallback with post ID if available, otherwise use timestamp
+    const fallbackSuffix = postId ? postId.toString() : Date.now().toString();
+    slug = `post-${fallbackSuffix}`;
+  }
+
+  return slug;
 }
 
-async function generateUniqueSlug(title: string): Promise<string> {
-  const baseSlug = createPostSlug(title);
-  let uniqueSlug = baseSlug;
-  let counter = 1;
-  
+async function generateUniqueSlug(title: string, postId?: number): Promise<string> {
   try {
+    const baseSlug = createPostSlug(title, postId);
+    
+    // If we have a post ID, append it to ensure uniqueness
+    if (postId) {
+      return `${baseSlug}-${postId}`;
+    }
+    
+    // Otherwise, use the existing uniqueness check logic
+    let uniqueSlug = baseSlug;
+    let counter = 1;
+    
     while (true) {
       const existingPost = await db.select({ id: posts.id }).from(posts).where(eq(posts.slug, uniqueSlug)).limit(1);
       if (existingPost.length === 0) {
@@ -46,13 +79,14 @@ async function generateUniqueSlug(title: string): Promise<string> {
       uniqueSlug = `${baseSlug}-${counter}`;
       counter++;
     }
+    
+    return uniqueSlug;
   } catch (error: any) {
-    // If slug column doesn't exist, just return the base slug
-    console.warn('Slug column may not exist, returning base slug:', error.message);
-    return baseSlug;
+    // If slug column doesn't exist, create a simple fallback
+    console.warn('Slug column may not exist, using fallback slug:', error.message);
+    const fallbackSuffix = postId ? postId.toString() : Date.now().toString();
+    return `post-${fallbackSuffix}`;
   }
-  
-  return uniqueSlug;
 }
 
 // Reddit-style hot algorithm
@@ -156,7 +190,7 @@ export class DatabaseStorage implements IStorage {
 
   async getPosts(communityId?: number, sort: 'hot' | 'new' = 'hot'): Promise<PostWithCommunity[]> {
     try {
-      // Select specific fields to avoid missing slug column errors in production
+      // Select specific fields including slug
       const query = db
         .select({
           post: {
@@ -166,7 +200,8 @@ export class DatabaseStorage implements IStorage {
             communityId: posts.communityId,
             votes: posts.votes,
             commentCount: posts.commentCount,
-            createdAt: posts.createdAt
+            createdAt: posts.createdAt,
+            slug: posts.slug
           },
           community: {
             id: communities.id,
@@ -187,7 +222,6 @@ export class DatabaseStorage implements IStorage {
       
       const postsWithCommunity = result.map(row => ({
         ...row.post,
-        slug: null, // Set to null for compatibility with production databases without slug column
         community: row.community!
       }));
       
@@ -226,7 +260,8 @@ export class DatabaseStorage implements IStorage {
             communityId: posts.communityId,
             votes: posts.votes,
             commentCount: posts.commentCount,
-            createdAt: posts.createdAt
+            createdAt: posts.createdAt,
+            slug: posts.slug
           },
           community: {
             id: communities.id,
@@ -243,7 +278,6 @@ export class DatabaseStorage implements IStorage {
       
       return {
         ...result.post,
-        slug: null, // Set to null for compatibility with production databases without slug column
         community: result.community!
       };
     } catch (error: any) {
@@ -254,15 +288,35 @@ export class DatabaseStorage implements IStorage {
 
   async createPost(insertPost: InsertPost): Promise<Post> {
     try {
-      // Try to generate unique slug from title
-      const slug = await generateUniqueSlug(insertPost.title);
-      
-      const [post] = await db
+      // First, create the post without a slug to get the ID
+      const [tempPost] = await db
         .insert(posts)
         .values({
-          ...insertPost,
-          slug
+          title: insertPost.title,
+          content: insertPost.content,
+          communityId: insertPost.communityId,
+          votes: 1, // Default starting votes
+          commentCount: 0, // Default starting comment count
+          slug: null // Start with null slug
         })
+        .returning({
+          id: posts.id,
+          title: posts.title,
+          content: posts.content,
+          communityId: posts.communityId,
+          votes: posts.votes,
+          commentCount: posts.commentCount,
+          createdAt: posts.createdAt
+        });
+
+      // Now generate the slug with the post ID for guaranteed uniqueness
+      const finalSlug = await generateUniqueSlug(insertPost.title, tempPost.id);
+      
+      // Update the post with the final slug
+      const [finalPost] = await db
+        .update(posts)
+        .set({ slug: finalSlug })
+        .where(eq(posts.id, tempPost.id))
         .returning({
           id: posts.id,
           title: posts.title,
@@ -273,7 +327,8 @@ export class DatabaseStorage implements IStorage {
           commentCount: posts.commentCount,
           createdAt: posts.createdAt
         });
-      return post;
+
+      return finalPost;
     } catch (error: any) {
       console.log('⚠️  Slug column missing or error creating post with slug, trying without slug...', error.message);
       // Fallback: create post without slug for production databases that don't have the column
@@ -309,7 +364,6 @@ export class DatabaseStorage implements IStorage {
 
   async getPostBySlug(slug: string): Promise<PostWithCommunity | undefined> {
     try {
-      // Check if slug column exists by trying to query it
       const [result] = await db
         .select({
           post: {
@@ -319,7 +373,8 @@ export class DatabaseStorage implements IStorage {
             communityId: posts.communityId,
             votes: posts.votes,
             commentCount: posts.commentCount,
-            createdAt: posts.createdAt
+            createdAt: posts.createdAt,
+            slug: posts.slug
           },
           community: {
             id: communities.id,
@@ -336,11 +391,10 @@ export class DatabaseStorage implements IStorage {
       
       return {
         ...result.post,
-        slug: null, // Set to null for compatibility with production databases without slug column
         community: result.community!
       };
     } catch (error: any) {
-      console.error('Error fetching post by slug (slug column may not exist):', error);
+      console.error('Error fetching post by slug:', error);
       return undefined;
     }
   }

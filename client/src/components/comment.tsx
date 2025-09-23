@@ -43,8 +43,12 @@ export default function Comment({ comment, postId, depth = 0, parentVisualDepth 
     onSuccess: () => {
       setReplyContent("");
       setShowReplyForm(false);
+      // Invalidate all comment queries for this post (all sort types)
       queryClient.invalidateQueries({ queryKey: ["/api/posts", postId, "comments"] });
+      // Invalidate all posts queries (list views)
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      // Invalidate slug-based post queries in case we're on a post detail page
+      queryClient.invalidateQueries({ queryKey: ["/api/posts/by-slug"] });
     }
   });
 

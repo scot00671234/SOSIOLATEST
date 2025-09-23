@@ -31,10 +31,16 @@ export default function VoteButton({
       });
     },
     onSuccess: () => {
-      // Invalidate relevant queries
+      // Invalidate all posts queries (list views)
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      
       if (targetType === 'post') {
+        // Invalidate ID-based post query
         queryClient.invalidateQueries({ queryKey: ["/api/posts", targetId] });
+        // Invalidate all slug-based post queries (broader pattern to catch any slug)
+        queryClient.invalidateQueries({ queryKey: ["/api/posts/by-slug"] });
+        // Invalidate comments for this post (all sorting types)
+        queryClient.invalidateQueries({ queryKey: ["/api/posts", targetId, "comments"] });
       }
     }
   });

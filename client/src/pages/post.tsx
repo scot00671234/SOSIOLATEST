@@ -283,7 +283,7 @@ export default function PostPage() {
                         <Comment
                           key={comment.id}
                           comment={comment}
-                          postId={postId}
+                          postId={post.id}
                         />
                       ))}
                       
@@ -317,7 +317,7 @@ export default function PostPage() {
       <CommunityNotesModal
         open={showCommunityNotes}
         onOpenChange={setShowCommunityNotes}
-        postId={postId}
+        postId={post?.id || 0}
       />
     </div>
   );

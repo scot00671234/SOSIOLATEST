@@ -119,8 +119,8 @@ export default function PostCard({ post }: PostCardProps) {
                 />
               )}
               
-              <div className="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm text-muted-foreground">
-                <div className="flex items-center">
+              <div className="flex items-center space-x-4 sm:space-x-6 text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center py-1 px-2 -mx-2 rounded hover:bg-muted/50 transition-colors" data-testid="comment-count">
                   <MessageCircle className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
                   <span className="hidden xs:inline">{post.commentCount} comments</span>
                   <span className="xs:hidden">{post.commentCount}</span>
@@ -131,10 +131,11 @@ export default function PostCard({ post }: PostCardProps) {
                     e.preventDefault();
                     e.stopPropagation();
                   }}
+                  data-testid="share-button"
                 >
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <div className="flex items-center">
+                      <div className="flex items-center py-1 px-2 -mx-2 rounded hover:bg-muted/50 transition-colors">
                         <Share className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
                         <span className="hidden sm:inline">Share</span>
                       </div>

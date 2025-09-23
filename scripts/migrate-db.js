@@ -49,6 +49,11 @@ async function runMigration() {
         community_id INTEGER NOT NULL REFERENCES communities(id),
         votes INTEGER DEFAULT 1 NOT NULL,
         comment_count INTEGER DEFAULT 0 NOT NULL,
+        link TEXT,
+        link_title TEXT,
+        link_description TEXT,
+        link_image TEXT,
+        link_site_name TEXT,
         created_at TIMESTAMP DEFAULT NOW() NOT NULL
       );
 
@@ -96,8 +101,16 @@ async function runMigration() {
         created_at TIMESTAMP DEFAULT NOW() NOT NULL
       );
 
-      -- Add slug column to existing posts table (idempotent)
+      -- Add missing columns to existing posts table (idempotent)
       ALTER TABLE posts ADD COLUMN IF NOT EXISTS slug TEXT;
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS link TEXT;
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_title TEXT;
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_description TEXT;  
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_image TEXT;
+      ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_site_name TEXT;
+      
+      -- Create unique constraint on slug (safe)
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_posts_slug_unique ON posts(slug) WHERE slug IS NOT NULL;
       
       -- Create indexes for performance
       CREATE INDEX IF NOT EXISTS idx_posts_community_id ON posts(community_id);

@@ -8,6 +8,7 @@ import { insertCommunitySchema, insertPostSchema, insertCommentSchema } from "@s
 import { eq } from "drizzle-orm";
 import { communityNotes } from "@shared/schema";
 import { z } from "zod";
+import { extractLinkPreview, isValidUrl } from "./linkPreview";
 
 // Initialize Stripe
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -169,11 +170,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Extract link preview metadata
+  app.post("/api/link-preview", async (req, res) => {
+    try {
+      const { url } = z.object({ url: z.string() }).parse(req.body);
+      
+      if (!isValidUrl(url)) {
+        return res.status(400).json({ message: "Invalid URL format" });
+      }
+
+      const preview = await extractLinkPreview(url);
+      if (!preview) {
+        return res.status(400).json({ message: "Unable to extract preview from this URL" });
+      }
+
+      res.json(preview);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      console.error("Link preview error:", error);
+      res.status(500).json({ message: "Failed to extract link preview" });
+    }
+  });
+
   // Create a new post
   app.post("/api/posts", async (req, res) => {
     try {
       const data = insertPostSchema.parse(req.body);
-      const post = await storage.createPost(data);
+      
+      // If a link is provided, extract its metadata
+      let linkPreview = null;
+      if (data.link && isValidUrl(data.link)) {
+        linkPreview = await extractLinkPreview(data.link);
+      }
+
+      // Create post with link metadata
+      const postData = {
+        ...data,
+        linkTitle: linkPreview?.title || null,
+        linkDescription: linkPreview?.description || null,
+        linkImage: linkPreview?.image || null,
+        linkSiteName: linkPreview?.siteName || null,
+      };
+
+      const post = await storage.createPost(postData);
       res.status(201).json(post);
     } catch (error) {
       if (error instanceof z.ZodError) {

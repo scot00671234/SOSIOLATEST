@@ -18,6 +18,12 @@ export const posts = pgTable("posts", {
   communityId: integer("community_id").notNull().references(() => communities.id),
   votes: integer("votes").default(1).notNull(),
   commentCount: integer("comment_count").default(0).notNull(),
+  // Link preview fields (optional)
+  link: text("link"),
+  linkTitle: text("link_title"),
+  linkDescription: text("link_description"),
+  linkImage: text("link_image"),
+  linkSiteName: text("link_site_name"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -110,6 +116,10 @@ export const insertPostSchema = createInsertSchema(posts).omit({
   slug: true,
   votes: true,
   commentCount: true,
+  linkTitle: true,
+  linkDescription: true,
+  linkImage: true,
+  linkSiteName: true,
   createdAt: true,
 });
 

@@ -181,7 +181,7 @@ export class DatabaseStorage implements IStorage {
 
   async getPosts(communityId?: number, sort: 'hot' | 'new' = 'hot'): Promise<PostWithCommunity[]> {
     try {
-      // Select specific fields including slug
+      // Select specific fields including slug and link preview fields
       const query = db
         .select({
           post: {
@@ -189,6 +189,11 @@ export class DatabaseStorage implements IStorage {
             title: posts.title,
             content: posts.content,
             communityId: posts.communityId,
+            link: posts.link,
+            linkTitle: posts.linkTitle,
+            linkDescription: posts.linkDescription,
+            linkImage: posts.linkImage,
+            linkSiteName: posts.linkSiteName,
             votes: posts.votes,
             commentCount: posts.commentCount,
             createdAt: posts.createdAt,
@@ -249,6 +254,11 @@ export class DatabaseStorage implements IStorage {
             title: posts.title,
             content: posts.content,
             communityId: posts.communityId,
+            link: posts.link,
+            linkTitle: posts.linkTitle,
+            linkDescription: posts.linkDescription,
+            linkImage: posts.linkImage,
+            linkSiteName: posts.linkSiteName,
             votes: posts.votes,
             commentCount: posts.commentCount,
             createdAt: posts.createdAt,
@@ -277,7 +287,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createPost(insertPost: InsertPost): Promise<Post> {
+  async createPost(insertPost: InsertPost & { linkTitle?: string | null, linkDescription?: string | null, linkImage?: string | null, linkSiteName?: string | null }): Promise<Post> {
     try {
       // First, create the post without a slug to get the ID
       const [tempPost] = await db
@@ -286,6 +296,11 @@ export class DatabaseStorage implements IStorage {
           title: insertPost.title,
           content: insertPost.content,
           communityId: insertPost.communityId,
+          link: insertPost.link || null,
+          linkTitle: insertPost.linkTitle || null,
+          linkDescription: insertPost.linkDescription || null,
+          linkImage: insertPost.linkImage || null,
+          linkSiteName: insertPost.linkSiteName || null,
           votes: 1, // Default starting votes
           commentCount: 0, // Default starting comment count
           slug: null // Start with null slug
@@ -295,6 +310,11 @@ export class DatabaseStorage implements IStorage {
           title: posts.title,
           content: posts.content,
           communityId: posts.communityId,
+          link: posts.link,
+          linkTitle: posts.linkTitle,
+          linkDescription: posts.linkDescription,
+          linkImage: posts.linkImage,
+          linkSiteName: posts.linkSiteName,
           votes: posts.votes,
           commentCount: posts.commentCount,
           createdAt: posts.createdAt
@@ -314,6 +334,11 @@ export class DatabaseStorage implements IStorage {
           slug: posts.slug,
           content: posts.content,
           communityId: posts.communityId,
+          link: posts.link,
+          linkTitle: posts.linkTitle,
+          linkDescription: posts.linkDescription,
+          linkImage: posts.linkImage,
+          linkSiteName: posts.linkSiteName,
           votes: posts.votes,
           commentCount: posts.commentCount,
           createdAt: posts.createdAt
@@ -330,6 +355,11 @@ export class DatabaseStorage implements IStorage {
             title: insertPost.title,
             content: insertPost.content,
             communityId: insertPost.communityId,
+            link: insertPost.link || null,
+            linkTitle: insertPost.linkTitle || null,
+            linkDescription: insertPost.linkDescription || null,
+            linkImage: insertPost.linkImage || null,
+            linkSiteName: insertPost.linkSiteName || null,
             votes: 1, // Default starting votes
             commentCount: 0 // Default starting comment count
           })
@@ -338,6 +368,11 @@ export class DatabaseStorage implements IStorage {
             title: posts.title,
             content: posts.content,
             communityId: posts.communityId,
+            link: posts.link,
+            linkTitle: posts.linkTitle,
+            linkDescription: posts.linkDescription,
+            linkImage: posts.linkImage,
+            linkSiteName: posts.linkSiteName,
             votes: posts.votes,
             commentCount: posts.commentCount,
             createdAt: posts.createdAt
@@ -362,6 +397,11 @@ export class DatabaseStorage implements IStorage {
             title: posts.title,
             content: posts.content,
             communityId: posts.communityId,
+            link: posts.link,
+            linkTitle: posts.linkTitle,
+            linkDescription: posts.linkDescription,
+            linkImage: posts.linkImage,
+            linkSiteName: posts.linkSiteName,
             votes: posts.votes,
             commentCount: posts.commentCount,
             createdAt: posts.createdAt,

@@ -119,7 +119,7 @@ export default function PostCard({ post }: PostCardProps) {
                 />
               )}
               
-              <div className="flex items-center space-x-4 sm:space-x-6 text-xs sm:text-sm text-muted-foreground">
+              <div className="flex items-center space-x-6 sm:space-x-8 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center py-1 px-2 -mx-2 rounded hover:bg-muted/50 transition-colors" data-testid="comment-count">
                   <MessageCircle className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
                   <span className="hidden xs:inline">{post.commentCount} comments</span>

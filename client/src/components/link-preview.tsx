@@ -37,7 +37,7 @@ export default function LinkPreview({
         <div className={`flex ${compact ? 'flex-row' : linkImage ? 'flex-col sm:flex-row' : 'flex-row'}`}>
           {/* Image */}
           {linkImage && (
-            <div className={`${compact ? 'w-24 h-20 sm:w-28 sm:h-24 flex-shrink-0 overflow-hidden rounded-l-lg' : 'w-full sm:w-56 md:w-72 lg:w-80 flex-shrink-0'}`}>
+            <div className={`${compact ? 'w-32 h-24 sm:w-36 sm:h-28 flex-shrink-0 overflow-hidden rounded-l-lg' : 'w-full sm:w-56 md:w-72 lg:w-80 flex-shrink-0'}`}>
               {compact ? (
                 <img
                   src={linkImage}
@@ -67,7 +67,7 @@ export default function LinkPreview({
           )}
           
           {/* Content */}
-          <div className={`p-3 ${compact ? 'min-w-0 flex-1' : 'flex-1'} ${linkImage ? '' : 'border-l-2 border-primary/20'}`}>
+          <div className={`${compact ? 'p-3 min-w-0 flex-1' : 'p-3 flex-1'} ${linkImage ? '' : 'border-l-2 border-primary/20'}`}>
             {/* Site name */}
             {linkSiteName && (
               <div className="text-xs text-muted-foreground mb-1" data-testid="link-site-name">

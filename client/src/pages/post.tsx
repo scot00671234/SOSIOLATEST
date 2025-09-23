@@ -10,6 +10,7 @@ import VoteButton from "@/components/vote-button";
 import Comment from "@/components/comment";
 import CommunityNotesModal from "@/components/community-notes-modal";
 import SortMenu from "@/components/sort-menu";
+import LinkPreview from "@/components/link-preview";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -199,6 +200,18 @@ export default function PostPage() {
                       <div className="prose max-w-none mb-4">
                         <p className="whitespace-pre-wrap text-foreground">{post.content}</p>
                       </div>
+                      
+                      {/* Link Preview */}
+                      {post.link && (
+                        <LinkPreview
+                          link={post.link}
+                          linkTitle={post.linkTitle}
+                          linkDescription={post.linkDescription}
+                          linkImage={post.linkImage}
+                          linkSiteName={post.linkSiteName}
+                          compact={false}
+                        />
+                      )}
                       
                       {/* Community Notes Button */}
                       <div className="flex justify-end">

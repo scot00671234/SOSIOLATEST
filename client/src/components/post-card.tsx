@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast";
 import { createPostSlug } from "@/lib/utils";
 import VoteButton from "./vote-button";
+import LinkPreview from "./link-preview";
 import type { PostWithCommunity } from "@shared/schema";
 
 interface PostCardProps {
@@ -105,6 +106,18 @@ export default function PostCard({ post }: PostCardProps) {
               <p className="text-foreground mb-2 sm:mb-3 line-clamp-2 sm:line-clamp-3 text-sm sm:text-base">
                 {post.content}
               </p>
+              
+              {/* Link Preview */}
+              {post.link && (
+                <LinkPreview
+                  link={post.link}
+                  linkTitle={post.linkTitle}
+                  linkDescription={post.linkDescription}
+                  linkImage={post.linkImage}
+                  linkSiteName={post.linkSiteName}
+                  compact={true}
+                />
+              )}
               
               <div className="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center">

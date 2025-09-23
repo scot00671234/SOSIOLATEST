@@ -43,6 +43,7 @@ const createPostSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   content: z.string().min(1, "Content is required").max(5000, "Content too long"),
   communityId: z.string().min(1, "Please select a community"),
+  link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
 });
 
 type CreatePostData = z.infer<typeof createPostSchema>;
@@ -74,6 +75,7 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
       title: "",
       content: "",
       communityId: currentCommunityId,
+      link: "",
     },
   });
 
@@ -83,6 +85,7 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
         title: data.title,
         content: data.content,
         communityId: parseInt(data.communityId),
+        link: data.link || undefined,
       });
     },
     onSuccess: () => {
@@ -185,7 +188,25 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter post title..." {...field} />
+                    <Input placeholder="Enter post title..." {...field} data-testid="input-title" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="link"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Link (optional)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="https://example.com" 
+                      {...field} 
+                      data-testid="input-link"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -204,6 +225,7 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
                       className="resize-none"
                       rows={6}
                       {...field}
+                      data-testid="input-content"
                     />
                   </FormControl>
                   <FormMessage />
@@ -224,6 +246,7 @@ export default function CreatePostModal({ open, onOpenChange }: CreatePostModalP
                 type="submit" 
                 disabled={createPostMutation.isPending || communitiesLoading}
                 className="bg-muted text-foreground hover:bg-muted/80 transition-all border border-border/50 hover:border-border/80 hover:shadow-sm"
+                data-testid="button-create-post"
               >
                 {createPostMutation.isPending ? "Creating..." : "Create Post"}
               </Button>

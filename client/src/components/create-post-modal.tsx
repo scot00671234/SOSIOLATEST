@@ -43,7 +43,33 @@ const createPostSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   content: z.string().min(1, "Content is required").max(5000, "Content too long"),
   communityId: z.string().min(1, "Please select a community"),
-  link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  link: z.string().transform((val) => {
+    if (!val || val === "") return "";
+    
+    const trimmed = val.trim();
+    
+    // If it already has a protocol, return as is
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      return trimmed;
+    }
+    
+    // If it starts with //, add https:
+    if (trimmed.startsWith("//")) {
+      return "https:" + trimmed;
+    }
+    
+    // For everything else (domain names, subdomains, etc.), add https://
+    return "https://" + trimmed;
+  }).refine((val) => {
+    if (!val || val === "") return true; // Empty is valid (optional)
+    // Validate the final URL format
+    try {
+      new URL(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, "Please enter a valid URL or domain").optional().or(z.literal("")),
 });
 
 type CreatePostData = z.infer<typeof createPostSchema>;

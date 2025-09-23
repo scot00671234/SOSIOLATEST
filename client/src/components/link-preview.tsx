@@ -37,24 +37,24 @@ export default function LinkPreview({
         <div className={`flex ${compact ? 'flex-row' : linkImage ? 'flex-col sm:flex-row' : 'flex-row'}`}>
           {/* Image */}
           {linkImage && (
-            <div className={`${compact ? 'w-16 h-16 flex-shrink-0 overflow-hidden rounded-l-lg' : 'w-full sm:w-48 md:w-64 flex-shrink-0'}`}>
+            <div className={`${compact ? 'w-24 h-20 sm:w-28 sm:h-24 flex-shrink-0 overflow-hidden rounded-l-lg' : 'w-full sm:w-56 md:w-72 lg:w-80 flex-shrink-0'}`}>
               {compact ? (
                 <img
                   src={linkImage}
                   alt={linkTitle || 'Link preview'}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-l-lg"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                   data-testid="link-image"
                 />
               ) : (
-                <div className="max-h-[280px] sm:max-h-[320px] md:max-h-[400px] overflow-hidden sm:rounded-l-lg sm:rounded-tr-none rounded-t-lg">
+                <div className="overflow-hidden sm:rounded-l-lg sm:rounded-tr-none rounded-t-lg">
                   <AspectRatio ratio={16/9} className="bg-muted">
                     <img
                       src={linkImage}
                       alt={linkTitle || 'Link preview'}
-                      className="w-full h-full object-contain hover:object-cover transition-all duration-300 rounded-lg bg-muted"
+                      className="w-full h-full object-cover rounded-lg transition-transform duration-300 hover:scale-105"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}

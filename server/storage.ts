@@ -23,53 +23,44 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
-// Improved slug generation functions for international characters
-function createPostSlug(title: string, postId?: number): string {
-  // First, try to transliterate international characters to ASCII-safe equivalents
+// Unicode-aware slug generation for international characters
+function createPostSlug(title: string): string {
+  // Normalize and create Unicode-aware slug that preserves international characters
   let slug = title
+    .normalize('NFKC') // Normalize Unicode characters
     .toLowerCase()
-    // Replace common international characters with ASCII equivalents
-    .replace(/[àáâãäå]/g, 'a')
-    .replace(/[èéêë]/g, 'e')
-    .replace(/[ìíîï]/g, 'i')
-    .replace(/[òóôõö]/g, 'o')
-    .replace(/[ùúûü]/g, 'u')
-    .replace(/[ýÿ]/g, 'y')
-    .replace(/[ñ]/g, 'n')
-    .replace(/[ç]/g, 'c')
-    .replace(/[ß]/g, 'ss')
-    // Remove HTML tags and special characters
+    // Remove HTML tags
     .replace(/<[^>]*>/g, '')
-    // Replace spaces and non-alphanumeric characters with hyphens
-    .replace(/[^\w\s-]/g, '')
+    // Keep Unicode letters, numbers, spaces, and hyphens only (using Unicode property escapes)
+    .replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
+    // Replace spaces and multiple hyphens with single hyphen
     .replace(/[\s_-]+/g, '-')
     // Remove leading/trailing hyphens
     .replace(/^-+|-+$/g, '')
     // Limit length
     .substring(0, 80);
 
-  // If slug is empty or too short after processing (common with non-Latin scripts)
-  if (!slug || slug.length < 2) {
-    // Use fallback with post ID if available, otherwise use timestamp
-    const fallbackSuffix = postId ? postId.toString() : Date.now().toString();
-    slug = `post-${fallbackSuffix}`;
-  }
-
   return slug;
 }
 
 async function generateUniqueSlug(title: string, postId?: number): Promise<string> {
   try {
-    const baseSlug = createPostSlug(title, postId);
+    const baseSlug = createPostSlug(title);
     
-    // If we have a post ID, append it to ensure uniqueness
+    // If slug is empty after processing, use post ID as fallback
+    if (!baseSlug || baseSlug.length < 2) {
+      const fallbackSuffix = postId ? postId.toString() : Date.now().toString();
+      return `post-${fallbackSuffix}`;
+    }
+    
+    // For uniqueness, append post ID if available
     if (postId) {
       return `${baseSlug}-${postId}`;
     }
     
-    // Otherwise, use the existing uniqueness check logic
+    // Otherwise, use collision-based suffixing for uniqueness
     let uniqueSlug = baseSlug;
-    let counter = 1;
+    let counter = 2; // Start with 2 for the first collision
     
     while (true) {
       const existingPost = await db.select({ id: posts.id }).from(posts).where(eq(posts.slug, uniqueSlug)).limit(1);

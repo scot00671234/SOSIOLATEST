@@ -1,36 +1,45 @@
 import { db } from "../server/db";
 import { posts } from "../shared/schema";
-import { eq, isNull } from "drizzle-orm";
+import { eq, isNull, or } from "drizzle-orm";
 
-// Slug generation function
+// Unicode-aware slug generation for international characters (unified with server logic)
 function createPostSlug(title: string): string {
-  return title.toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .replace(/-+/g, '-')
-    .substring(0, 100); // Limit slug length
+  // Normalize and create Unicode-aware slug that preserves international characters
+  let slug = title
+    .normalize('NFKC') // Normalize Unicode characters
+    .toLowerCase()
+    // Remove HTML tags
+    .replace(/<[^>]*>/g, '')
+    // Keep Unicode letters, numbers, spaces, and hyphens only (using Unicode property escapes)
+    .replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
+    // Replace spaces and multiple hyphens with single hyphen
+    .replace(/[\s_-]+/g, '-')
+    // Remove leading/trailing hyphens
+    .replace(/^-+|-+$/g, '')
+    // Limit length
+    .substring(0, 80);
+
+  return slug;
 }
 
-async function generateUniqueSlug(title: string, existingSlugs: Set<string>): Promise<string> {
+function generateSlugForMigration(title: string, postId: number): string {
   const baseSlug = createPostSlug(title);
-  let uniqueSlug = baseSlug;
-  let counter = 1;
   
-  while (existingSlugs.has(uniqueSlug)) {
-    uniqueSlug = `${baseSlug}-${counter}`;
-    counter++;
+  // If slug is empty after processing, use post ID as fallback
+  if (!baseSlug || baseSlug.length < 2) {
+    return `post-${postId}`;
   }
   
-  existingSlugs.add(uniqueSlug);
-  return uniqueSlug;
+  // For migration, always append post ID to ensure uniqueness without collision checks
+  return `${baseSlug}-${postId}`;
 }
 
 async function migrateSlugs() {
   console.log('🔄 Starting slug migration...');
   
   try {
-    // Get all posts without slugs
-    const postsWithoutSlugs = await db.select().from(posts).where(isNull(posts.slug));
+    // Get all posts without slugs (null or empty string)
+    const postsWithoutSlugs = await db.select().from(posts).where(or(isNull(posts.slug), eq(posts.slug, '')));
     
     if (postsWithoutSlugs.length === 0) {
       console.log('✅ No posts need slug migration');
@@ -39,13 +48,9 @@ async function migrateSlugs() {
     
     console.log(`📝 Found ${postsWithoutSlugs.length} posts without slugs`);
     
-    // Get existing slugs to avoid conflicts
-    const existingPosts = await db.select().from(posts);
-    const existingSlugs = new Set(existingPosts.map(p => p.slug).filter(Boolean));
-    
-    // Generate and update slugs
+    // Generate and update slugs using new international-character-friendly approach
     for (const post of postsWithoutSlugs) {
-      const slug = await generateUniqueSlug(post.title, existingSlugs);
+      const slug = generateSlugForMigration(post.title, post.id);
       
       await db
         .update(posts)

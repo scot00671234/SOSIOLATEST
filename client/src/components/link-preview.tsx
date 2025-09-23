@@ -1,5 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface LinkPreviewProps {
   link: string;
@@ -36,17 +37,32 @@ export default function LinkPreview({
         <div className={`flex ${compact ? 'flex-row' : linkImage ? 'flex-col sm:flex-row' : 'flex-row'}`}>
           {/* Image */}
           {linkImage && (
-            <div className={`${compact ? 'w-16 h-16' : 'w-full sm:w-32 h-32 sm:h-24'} flex-shrink-0 overflow-hidden ${compact ? 'rounded-l-lg' : 'sm:rounded-l-lg sm:rounded-tr-none rounded-t-lg'}`}>
-              <img
-                src={linkImage}
-                alt={linkTitle || 'Link preview'}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Hide image if it fails to load
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-                data-testid="link-image"
-              />
+            <div className={`${compact ? 'w-16 h-16 flex-shrink-0 overflow-hidden rounded-l-lg' : 'w-full sm:w-48 md:w-64 flex-shrink-0'}`}>
+              {compact ? (
+                <img
+                  src={linkImage}
+                  alt={linkTitle || 'Link preview'}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                  data-testid="link-image"
+                />
+              ) : (
+                <div className="max-h-[280px] sm:max-h-[320px] md:max-h-[400px] overflow-hidden sm:rounded-l-lg sm:rounded-tr-none rounded-t-lg">
+                  <AspectRatio ratio={16/9} className="bg-muted">
+                    <img
+                      src={linkImage}
+                      alt={linkTitle || 'Link preview'}
+                      className="w-full h-full object-contain hover:object-cover transition-all duration-300 rounded-lg bg-muted"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                      data-testid="link-image"
+                    />
+                  </AspectRatio>
+                </div>
+              )}
             </div>
           )}
           

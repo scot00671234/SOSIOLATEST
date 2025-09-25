@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new community
-  app.post("/api/communities", async (req, res) => {
+  app.post("/api/communities", createRateLimitMiddleware('communities'), async (req, res) => {
     try {
       const data = insertCommunitySchema.parse(req.body);
       
@@ -168,6 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const community = await storage.createCommunity(data);
+      req.recordRateLimit(); // Record successful community creation
       res.status(201).json(community);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -273,7 +274,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new post
-  app.post("/api/posts", async (req, res) => {
+  app.post("/api/posts", createRateLimitMiddleware('posts'), async (req, res) => {
     try {
       const data = insertPostSchema.parse(req.body);
       
@@ -293,6 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const post = await storage.createPost(postData);
+      req.recordRateLimit(); // Record successful post creation
       res.status(201).json(post);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -332,11 +334,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new comment
-  app.post("/api/comments", async (req, res) => {
+  app.post("/api/comments", createRateLimitMiddleware('comments'), async (req, res) => {
     try {
       const data = insertCommentSchema.parse(req.body);
       console.log("Creating comment with data:", data);
       const comment = await storage.createComment(data);
+      req.recordRateLimit(); // Record successful comment creation
       res.status(201).json(comment);
     } catch (error) {
       if (error instanceof z.ZodError) {

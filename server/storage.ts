@@ -23,6 +23,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
+import { antiSpamService } from "./antiSpamService";
 // Unicode-aware slug generation for international characters
 function createPostSlug(title: string): string {
   // Normalize and create Unicode-aware slug that preserves international characters
@@ -216,10 +217,16 @@ export class DatabaseStorage implements IStorage {
         result = await query;
       }
       
-      const postsWithCommunity = result.map(row => ({
+      let postsWithCommunity = result.map(row => ({
         ...row.post,
         community: row.community!
       }));
+      
+      // Apply anti-spam filtering for frontpage (when no specific community is selected)
+      // This filters out posts with >80% text similarity to recent posts
+      if (!communityId) {
+        postsWithCommunity = antiSpamService.filterDuplicatePosts(postsWithCommunity);
+      }
       
       if (sort === 'new') {
         // Sort by creation date (newest first)

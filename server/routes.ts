@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { db } from "./db";
@@ -9,6 +9,16 @@ import { eq } from "drizzle-orm";
 import { communityNotes } from "@shared/schema";
 import { z } from "zod";
 import { extractLinkPreview, isValidUrl } from "./linkPreview";
+
+// Extend Express Request interface for rate limiting
+declare global {
+  namespace Express {
+    interface Request {
+      clientIP?: string;
+      recordRateLimit?: () => void;
+    }
+  }
+}
 
 // Initialize Stripe
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -168,7 +178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const community = await storage.createCommunity(data);
-      req.recordRateLimit(); // Record successful community creation
+      req.recordRateLimit?.(); // Record successful community creation
       res.status(201).json(community);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -294,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const post = await storage.createPost(postData);
-      req.recordRateLimit(); // Record successful post creation
+      req.recordRateLimit?.(); // Record successful post creation
       res.status(201).json(post);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -339,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = insertCommentSchema.parse(req.body);
       console.log("Creating comment with data:", data);
       const comment = await storage.createComment(data);
-      req.recordRateLimit(); // Record successful comment creation
+      req.recordRateLimit?.(); // Record successful comment creation
       res.status(201).json(comment);
     } catch (error) {
       if (error instanceof z.ZodError) {

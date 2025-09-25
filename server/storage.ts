@@ -98,7 +98,7 @@ function calculateHotScore(votes: number, createdAt: Date): number {
 
 export interface IStorage {
   // Communities
-  getCommunities(sort?: 'alphabetic' | 'new' | 'popular'): Promise<Community[]>;
+  getCommunities(sort?: 'alphabetic' | 'new' | 'popular', filterDuplicates?: boolean): Promise<Community[]>;
   getCommunityByName(name: string): Promise<Community | undefined>;
   createCommunity(community: InsertCommunity): Promise<Community>;
   
@@ -142,9 +142,11 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getCommunities(sort: 'alphabetic' | 'new' | 'popular' = 'popular'): Promise<Community[]> {
+  async getCommunities(sort: 'alphabetic' | 'new' | 'popular' = 'popular', filterDuplicates: boolean = false): Promise<Community[]> {
+    let communitiesList: Community[];
+    
     if (sort === 'new') {
-      return await db.select().from(communities).orderBy(desc(communities.createdAt));
+      communitiesList = await db.select().from(communities).orderBy(desc(communities.createdAt));
     } else if (sort === 'popular') {
       // Sort by popularity (communities with most posts)
       const result = await db
@@ -160,11 +162,18 @@ export class DatabaseStorage implements IStorage {
         .groupBy(communities.id)
         .orderBy(desc(sql`count(${posts.id})`), communities.name);
       
-      return result.map(({ postCount, ...community }) => community);
+      communitiesList = result.map(({ postCount, ...community }) => community);
     } else {
       // alphabetic (default)
-      return await db.select().from(communities).orderBy(communities.name);
+      communitiesList = await db.select().from(communities).orderBy(communities.name);
     }
+    
+    // Apply duplicate filtering if requested (for sidebar, but not for search)
+    if (filterDuplicates) {
+      communitiesList = antiSpamService.filterDuplicateCommunities(communitiesList);
+    }
+    
+    return communitiesList;
   }
 
   async getCommunityByName(name: string): Promise<Community | undefined> {

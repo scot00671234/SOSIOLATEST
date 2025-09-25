@@ -25,7 +25,8 @@ import type { Community } from "@shared/schema";
 
 function MobileCommunities({ onCommunityClick }: { onCommunityClick: () => void }) {
   const { data: communities, isLoading } = useQuery<Community[]>({
-    queryKey: ["/api/communities"],
+    queryKey: ["/api/communities", "mobile-filtered"],
+    queryFn: () => fetch(`/api/communities?filterDuplicates=true`).then(res => res.json())
   });
 
   if (isLoading) {

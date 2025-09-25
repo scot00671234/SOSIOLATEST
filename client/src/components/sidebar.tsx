@@ -14,8 +14,8 @@ export default function Sidebar() {
   const isPostPage = location.startsWith('/post/');
   
   const { data: communities, isLoading } = useQuery<Community[]>({
-    queryKey: ["/api/communities", sortBy],
-    queryFn: () => fetch(`/api/communities?sort=${sortBy}`).then(res => res.json())
+    queryKey: ["/api/communities", sortBy, "filtered"],
+    queryFn: () => fetch(`/api/communities?sort=${sortBy}&filterDuplicates=true`).then(res => res.json())
   });
 
   if (isLoading) {

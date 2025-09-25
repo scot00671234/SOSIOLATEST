@@ -158,7 +158,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/communities", async (req, res) => {
     try {
       const sort = (req.query.sort as 'alphabetic' | 'new' | 'popular') || 'alphabetic';
-      const communities = await storage.getCommunities(sort);
+      const filterDuplicates = req.query.filterDuplicates === 'true'; // Default to false for backward compatibility
+      const communities = await storage.getCommunities(sort, filterDuplicates);
       res.json(communities);
     } catch (error) {
       console.error("Failed to fetch communities:", error);

@@ -43,6 +43,84 @@ function getClientIP(req: any): string {
          `fallback-${Date.now()}-${Math.random()}`; // Generate unique fallback for testing
 }
 
+// Rate limiting store - tracks IP addresses and their actions
+interface RateLimitEntry {
+  timestamps: number[];
+}
+
+const rateLimitStore = new Map<string, {
+  communities: RateLimitEntry;
+  posts: RateLimitEntry;
+  comments: RateLimitEntry;
+}>();
+
+// Rate limit configurations
+const RATE_LIMITS = {
+  communities: { maxActions: 5, windowMs: 60 * 60 * 1000 }, // 5 per hour
+  posts: { maxActions: 4, windowMs: 60 * 60 * 1000 }, // 4 per hour
+  comments: { maxActions: 100, windowMs: 60 * 60 * 1000 }, // 100 per hour
+} as const;
+
+type ActionType = keyof typeof RATE_LIMITS;
+
+// Clean up old entries (remove timestamps older than the window)
+function cleanupRateLimit(entry: RateLimitEntry, windowMs: number): void {
+  const now = Date.now();
+  entry.timestamps = entry.timestamps.filter(timestamp => now - timestamp < windowMs);
+}
+
+// Check if IP has exceeded rate limit for a specific action type
+function checkRateLimit(ip: string, actionType: ActionType): boolean {
+  const config = RATE_LIMITS[actionType];
+  
+  // Get or create IP entry
+  let ipEntry = rateLimitStore.get(ip);
+  if (!ipEntry) {
+    ipEntry = {
+      communities: { timestamps: [] },
+      posts: { timestamps: [] },
+      comments: { timestamps: [] },
+    };
+    rateLimitStore.set(ip, ipEntry);
+  }
+  
+  const actionEntry = ipEntry[actionType];
+  
+  // Clean up old timestamps
+  cleanupRateLimit(actionEntry, config.windowMs);
+  
+  // Check if limit exceeded
+  return actionEntry.timestamps.length >= config.maxActions;
+}
+
+// Record an action for rate limiting
+function recordAction(ip: string, actionType: ActionType): void {
+  const ipEntry = rateLimitStore.get(ip);
+  if (ipEntry) {
+    ipEntry[actionType].timestamps.push(Date.now());
+  }
+}
+
+// Middleware factory for rate limiting
+function createRateLimitMiddleware(actionType: ActionType) {
+  return (req: any, res: any, next: any) => {
+    const ip = getClientIP(req);
+    
+    if (checkRateLimit(ip, actionType)) {
+      const config = RATE_LIMITS[actionType];
+      return res.status(429).json({
+        message: `Rate limit exceeded. Maximum ${config.maxActions} ${actionType} per hour allowed.`,
+        retryAfter: Math.ceil(config.windowMs / 1000), // seconds
+      });
+    }
+    
+    // Add IP and record function to request for use in route handler
+    req.clientIP = ip;
+    req.recordRateLimit = () => recordAction(ip, actionType);
+    next();
+  };
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Health check endpoint
